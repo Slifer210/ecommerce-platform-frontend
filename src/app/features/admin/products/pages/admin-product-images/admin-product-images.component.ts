@@ -1,8 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+
 import { AdminProductImageService } from '../../services/admin-product-image.service';
 import { ProductImage } from '../../models/product-image.model';
+import { CLOUDINARY_CONFIG } from '../../../../../core/config/cloudinary.config';
 
 @Component({
   selector: 'app-admin-product-images',
@@ -17,8 +19,8 @@ export class AdminProductImagesComponent implements OnInit {
   images: ProductImage[] = [];
   loading = false;
 
-  private cloudName = 'dv7jhcs8z';
-  private uploadPreset = 'ecommerce';
+  // config centralizada (clean architecture)
+  private cloudinary = CLOUDINARY_CONFIG;
 
   constructor(
     private http: HttpClient,
@@ -36,19 +38,21 @@ export class AdminProductImagesComponent implements OnInit {
   }
 
   upload(event: Event): void {
+
     const input = event.target as HTMLInputElement;
-    if (!input.files || input.files.length === 0) return;
+
+    if (!input.files?.length) return;
 
     const file = input.files[0];
 
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('upload_preset', this.uploadPreset);
+    formData.append('upload_preset', this.cloudinary.uploadPreset);
 
     this.loading = true;
 
     this.http.post<any>(
-      `https://api.cloudinary.com/v1_1/${this.cloudName}/image/upload`,
+      this.cloudinary.uploadUrl,
       formData
     ).subscribe({
       next: res => {

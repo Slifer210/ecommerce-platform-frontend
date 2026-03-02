@@ -2,7 +2,9 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+
 import { ProductReviewService } from '../../services/product-review.service';
+import { CLOUDINARY_CONFIG } from '../../../../core/config/cloudinary.config';
 
 @Component({
   selector: 'app-review-form',
@@ -21,29 +23,30 @@ export class ReviewFormComponent {
   images: string[] = [];
   uploading = false;
 
-  private cloudName = 'dv7jhcs8z';
-  private uploadPreset = 'ecommerce';
+  private cloudinary = CLOUDINARY_CONFIG;
 
   constructor(
     private reviewService: ProductReviewService,
     private http: HttpClient
   ) {}
 
-  uploadImage(event: Event) {
+  uploadImage(event: Event): void {
+
     const input = event.target as HTMLInputElement;
-    if (!input.files || input.files.length === 0) return;
+
+    if (!input.files?.length) return;
     if (this.images.length >= 3) return;
 
     const file = input.files[0];
 
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('upload_preset', this.uploadPreset);
+    formData.append('upload_preset', this.cloudinary.uploadPreset);
 
     this.uploading = true;
 
     this.http.post<any>(
-      `https://api.cloudinary.com/v1_1/${this.cloudName}/image/upload`,
+      this.cloudinary.uploadUrl,
       formData
     ).subscribe({
       next: res => {
@@ -57,11 +60,11 @@ export class ReviewFormComponent {
     });
   }
 
-  removeImage(index: number) {
+  removeImage(index: number): void {
     this.images.splice(index, 1);
   }
 
-  submit() {
+  submit(): void {
     this.reviewService.createReview(this.productId, {
       orderItemId: this.orderItemId,
       rating: this.rating,

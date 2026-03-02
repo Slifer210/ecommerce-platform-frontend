@@ -12,9 +12,10 @@ import { ProfileApiService } from '../../services/profile-api.service';
 import { IdentityDocumentType, Profile } from '../../models/profile.model';
 import { ProfileForm } from '../../models/profile.form';
 import { AuthState } from '../../../../core/auth/auth.state';
+import { CLOUDINARY_CONFIG } from '../../../../core/config/cloudinary.config';
+
 import Swal from 'sweetalert2';
 import { forkJoin } from 'rxjs';
-
 
 @Component({
   selector: 'app-profile-form',
@@ -36,8 +37,8 @@ export class ProfileFormComponent implements OnInit {
   form!: FormGroup<ProfileForm>;
   profileImageUrl: string | null = null;
 
-  private cloudName = 'dv7jhcs8z';
-  private uploadPreset = 'ecommerce';
+  // config centralizada
+  private cloudinary = CLOUDINARY_CONFIG;
 
   constructor(
     private fb: FormBuilder,
@@ -47,6 +48,7 @@ export class ProfileFormComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+
     this.form = this.fb.group<ProfileForm>({
       fullName: this.fb.control<string | null>(null, {
         validators: [Validators.required]
@@ -76,8 +78,8 @@ export class ProfileFormComponent implements OnInit {
     });
   }
 
-
   private patchProfile(profile: Profile): void {
+
     this.profileImageUrl = profile.profileImageUrl;
 
     this.form.patchValue({
@@ -91,6 +93,7 @@ export class ProfileFormComponent implements OnInit {
   }
 
   submit(): void {
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -99,6 +102,7 @@ export class ProfileFormComponent implements OnInit {
     if (this.saving) return;
 
     this.saving = true;
+
     const value = this.form.getRawValue();
 
     this.profileApi.updateProfile({
@@ -108,12 +112,12 @@ export class ProfileFormComponent implements OnInit {
       phone: value.phone!.trim()
     }).subscribe({
       next: () => {
+
         this.saving = false;
 
         // refresca /me
         this.authState.loadUser().subscribe();
 
-        // feedback visual (IMPORTANTE)
         Swal.fire({
           icon: 'success',
           title: 'Perfil actualizado',
@@ -130,31 +134,31 @@ export class ProfileFormComponent implements OnInit {
     });
   }
 
-
-  /* =========================
-   * UPLOAD FOTO CORREGIDO
-   * ========================= */
   uploadPhoto(event: Event): void {
+
     const input = event.target as HTMLInputElement;
-    if (!input.files || input.files.length === 0) return;
+
+    if (!input.files?.length) return;
 
     const file = input.files[0];
 
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('upload_preset', this.uploadPreset);
+    formData.append('upload_preset', this.cloudinary.uploadPreset);
 
     this.http.post<any>(
-      `https://api.cloudinary.com/v1_1/${this.cloudName}/image/upload`,
+      this.cloudinary.uploadUrl,
       formData
     ).subscribe({
       next: res => {
+
         const imageUrl = res.secure_url as string;
 
         this.profileApi.updateProfilePhoto(imageUrl).subscribe(() => {
+
           this.profileImageUrl = imageUrl;
 
-          // 🔥 sincroniza el header automáticamente
+          // sincroniza header
           this.authState.updateProfileImage(imageUrl);
         });
       }
@@ -162,12 +166,11 @@ export class ProfileFormComponent implements OnInit {
   }
 
   get profileProgress(): number {
+
     let completed = 0;
 
     if (this.profileImageUrl) completed += 25;
-
     if (this.form?.controls.fullName?.value?.trim()) completed += 25;
-
     if (this.form?.controls.phone?.value?.trim()) completed += 25;
 
     if (
@@ -181,24 +184,27 @@ export class ProfileFormComponent implements OnInit {
   }
 
   get progressLabel(): string {
+
     const p = this.profileProgress;
 
     if (p === 100) return 'Perfil completo';
     if (p >= 75) return 'Casi listo';
     if (p >= 50) return 'A medio camino';
     if (p >= 25) return 'Empezando';
+
     return 'Perfil incompleto';
   }
 
   get progressColor(): string {
+
     const p = this.profileProgress;
 
     if (p === 100) return 'bg-green-500';
     if (p >= 75) return 'bg-lime-500';
     if (p >= 50) return 'bg-yellow-400';
+
     return 'bg-red-400';
   }
-
 
   cancel(): void {
     this.cancelled.emit();

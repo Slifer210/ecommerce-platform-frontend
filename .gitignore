@@ -1,17 +1,28 @@
-# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
-
-# Compiled output
+# ===============================
+# COMPILED OUTPUT
+# ===============================
 /dist
 /tmp
 /out-tsc
 /bazel-out
 
-# Node
+# ===============================
+# NODE
+# ===============================
 /node_modules
 npm-debug.log
 yarn-error.log
+*.log
 
-# IDEs and editors
+# ===============================
+# ANGULAR
+# ===============================
+/.angular
+/coverage
+
+# ===============================
+# IDEs / EDITORES
+# ===============================
 .idea/
 .project
 .classpath
@@ -28,15 +39,23 @@ yarn-error.log
 !.vscode/extensions.json
 .history/*
 
-# Miscellaneous
-/.angular/cache
+# ===============================
+# DOCKER
+# ===============================
+.dockerignore
+docker-compose.yml
+
+# ===============================
+# MISC
+# ===============================
 .sass-cache/
 /connect.lock
-/coverage
 /libpeerconnection.log
 testem.log
 /typings
 
-# System files
+# ===============================
+# SYSTEM FILES
+# ===============================
 .DS_Store
 Thumbs.db

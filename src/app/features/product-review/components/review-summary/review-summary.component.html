@@ -1,0 +1,47 @@
+<div *ngIf="summary" class="border-b pb-6 mb-6">
+
+    <div class="flex gap-8">
+
+        <!-- PROMEDIO -->
+        <div class="text-center min-w-[120px]">
+            <div class="text-4xl font-semibold text-blue-600">
+                {{ summary.averageRating | number:'1.1-1' }}
+            </div>
+
+            <app-rating-stars [rating]="summary.averageRating"></app-rating-stars>
+
+            <div class="text-sm text-gray-500 mt-1">
+                {{ summary.totalReviews }} calificaciones
+            </div>
+        </div>
+
+        <!-- DISTRIBUCIÓN -->
+        <div class="flex-1 space-y-2">
+            <div *ngFor="let s of [5,4,3,2,1]" class="flex items-center gap-3 text-sm">
+
+                <!-- ESTRELLA -->
+                <span class="w-10 text-gray-600 flex items-center gap-1">
+                    {{ s }}
+                    <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.538 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.783.57-1.838-.197-1.538-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.93 8.72c-.783-.57-.38-1.81.588-1.81h3.462a1 1 0 00.95-.69l1.07-3.292z"/>
+                    </svg>
+                </span>
+
+                <!-- BARRA -->
+                <div class="flex-1 h-2 bg-gray-200 rounded overflow-hidden">
+                    <div
+                        class="h-2 bg-blue-500 rounded transition-all duration-700"
+                        [style.width.%]="percentage(s)">
+                    </div>
+                </div>
+
+                <!-- % -->
+                <span class="w-10 text-xs text-gray-500 text-right">
+                {{ percentage(s) }}%
+                </span>
+
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,174 @@
+<div class="max-w-7xl mx-auto p-6">
+
+    <nav
+    *ngIf="breadcrumb().length > 0"
+    class="text-sm text-gray-500 mb-6 flex gap-2 flex-wrap"
+    >
+
+        <!-- Inicio -->
+        <span
+            class="cursor-pointer hover:text-black"
+            (click)="goCatalog()"
+        >
+            Inicio
+        </span>
+
+        <span>/</span>
+
+        <!-- Categorías (TODAS clickeables) -->
+        <ng-container *ngFor="let c of breadcrumb()">
+
+            <span
+            class="cursor-pointer hover:text-black"
+            (click)="goCategory(c.id)"
+            >
+            {{ c.name }}
+            </span>
+
+            <span>/</span>
+
+        </ng-container>
+
+        <!-- Producto (NO clickeable) -->
+        <span class="text-gray-700 font-medium">
+            {{ product()?.name }}
+        </span>
+
+    </nav>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+
+        <div>
+        <div class="border rounded-lg p-4 bg-white">
+            <img
+            [src]="selectedImage() || product()?.mainImageUrl"
+            alt="Producto"
+            class="w-full h-80 object-contain"
+            />
+        </div>
+
+        <div
+            *ngIf="galleryImages().length > 1"
+            class="flex gap-3 mt-4"
+        >
+            <img
+            *ngFor="let img of galleryImages()"
+            [src]="img"
+            (click)="selectImage(img)"
+            class="w-16 h-16 object-contain border rounded cursor-pointer hover:ring"
+            />
+        </div>
+        </div>
+
+        <div class="space-y-5">
+
+        <h1 class="text-2xl font-bold">
+            {{ product()?.name }}
+        </h1>
+
+        <div class="flex flex-wrap gap-2">
+            <span
+            *ngFor="let c of product()?.categories"
+            class="text-xs bg-gray-100 px-2 py-1 rounded"
+            >
+            {{ c.name }}
+            </span>
+        </div>
+
+        <div class="text-3xl font-semibold">
+            S/ {{ product()?.price }}
+        </div>
+
+        <div
+            class="text-sm font-medium"
+            [class.text-green-600]="isAvailable()"
+            [class.text-red-600]="!isAvailable()"
+        >
+            {{ stockLabel() }}
+        </div>
+
+        <div class="flex items-center gap-3">
+            <label class="text-sm text-gray-600">Cantidad</label>
+            <input
+            type="number"
+            min="1"
+            [max]="product()?.stock ?? 1"
+            [(ngModel)]="quantity"
+            class="w-20 border rounded px-2 py-1 text-center"
+            [disabled]="!isAvailable()"
+            />
+        </div>
+
+        <button
+            class="w-full bg-black text-white py-3 rounded disabled:bg-gray-400"
+            [disabled]="!isAvailable()"
+            (click)="addToCart()"
+        >
+            Agregar al carrito
+        </button>
+        </div>
+    </div>
+
+    <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+
+        <div class="md:col-span-2">
+        <h2 class="text-lg font-semibold mb-2">Descripción</h2>
+        <p class="text-gray-700 leading-relaxed">
+            {{ product()?.description || 'Sin descripción disponible.' }}
+        </p>
+        </div>
+
+        <div>
+        <h2 class="text-lg font-semibold mb-2">Características principales</h2>
+        <ul class="text-sm text-gray-700 space-y-1">
+            <li *ngFor="let a of principales()">
+            • {{ a.name }}: {{ a.value }}
+            </li>
+        </ul>
+
+        <h2
+            *ngIf="otros().length > 0"
+            class="text-lg font-semibold mt-6 mb-2"
+        >
+            Otros
+        </h2>
+        <ul class="text-sm text-gray-700 space-y-1">
+            <li *ngFor="let a of otros()">
+            • {{ a.name }}: {{ a.value }}
+            </li>
+        </ul>
+        </div>
+
+    </div>
+
+    <div class="mt-16 border-t pt-10">
+        <app-product-questions
+            *ngIf="product()"
+            [productId]="product()!.id">
+        </app-product-questions>
+    </div>
+
+    <!-- ================= REVIEWS ================= -->
+    <div class="mt-16 border-t pt-10">
+
+        <h2 class="text-2xl font-semibold mb-6">
+            Opiniones de clientes
+        </h2>
+
+        <!-- Formulario: solo si el usuario compró -->
+        <app-review-form
+            *ngIf="product() && orderItemId"
+            [productId]="product()!.id"
+            [orderItemId]="orderItemId!">
+        </app-review-form>
+
+        <!-- Listado de reviews -->
+        <app-review-list
+            *ngIf="product()"
+            [productId]="product()!.id">
+        </app-review-list>
+
+    </div>
+    <!-- ================= END REVIEWS ================= -->
+
+</div>

@@ -1,0 +1,47 @@
+<aside
+    class="rounded-lg border border-gray-200
+            bg-white
+            p-4
+            space-y-6"
+    >
+
+    <!-- DIVISOR -->
+    <div *ngIf="catalogState.hasActiveFilters()" class="border-t border-gray-200"></div>
+
+    <!-- CATEGORÍAS -->
+    <section class="space-y-3">
+        <app-catalog-categories
+        [rootCategories]="rootCategories"
+        [categoryTree]="categoryTree"
+        [facetCount]="facetCount"
+        (categorySelect)="categorySelect.emit($event)"
+        ></app-catalog-categories>
+    </section>
+
+    <!-- DIVISOR -->
+    <div class="border-t border-gray-200"></div>
+
+    <!-- PRECIO -->
+    <section class="space-y-3">
+        <app-catalog-price-filter
+        [priceRanges]="facetPriceRanges"
+        [minPrice]="minPrice"
+        [maxPrice]="maxPrice"
+        (select)="priceSelect.emit($event)"
+        (clear)="priceSelect.emit({ min: null, max: null })"
+        ></app-catalog-price-filter>
+    </section>
+
+    <!-- DIVISOR -->
+    <div *ngIf="facetAttributes.length > 0" class="border-t border-gray-200"></div>
+
+    <!-- ATRIBUTOS -->
+    <section class="space-y-3">
+        <app-catalog-facets
+        [facetAttributes]="facetAttributes"
+        [selectedAttributes]="selectedAttributes"
+        (attributeToggle)="emitAttribute($event)"
+        ></app-catalog-facets>
+    </section>
+
+</aside>

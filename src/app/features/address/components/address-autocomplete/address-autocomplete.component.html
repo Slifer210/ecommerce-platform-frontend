@@ -1,0 +1,36 @@
+<div class="relative">
+
+    <!-- INPUT -->
+    <input
+        type="text"
+        placeholder="Busca tu dirección"
+        class="border px-4 py-2 w-full"
+        [value]="query"
+        (input)="onSearch($event)"
+    />
+
+    <!-- RESULTADOS AUTOCOMPLETE -->
+    <ul
+        *ngIf="results.length"
+        class="absolute z-10 w-full border bg-white mt-1 rounded shadow max-h-64 overflow-auto"
+    >
+        <li
+        *ngFor="let r of results"
+        class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+        (click)="select(r)"
+        >
+        {{ r.display_name }}
+        </li>
+    </ul>
+
+    <!-- USAR DIRECCIÓN MANUAL -->
+    <button
+        *ngIf="!results.length && query.length >= 5"
+        type="button"
+        class="mt-2 text-xs text-blue-600 hover:underline"
+        (click)="useManualAddress()"
+    >
+        Usar esta dirección tal como está escrita
+    </button>
+
+</div>

@@ -1,0 +1,144 @@
+<h1 class="text-2xl font-bold mb-2">Reporte de Clientes</h1>
+<p class="text-gray-600 mb-6">
+    Analiza clientes activos, frecuencia de compra y valor generado.
+</p>
+
+<!-- ========================= -->
+<!-- FILTROS -->
+<!-- ========================= -->
+<div class="bg-white p-4 rounded shadow mb-6 flex flex-wrap gap-4 items-end">
+
+    <div>
+        <label class="text-sm text-gray-600">Desde</label>
+        <input
+            type="date"
+            class="border px-3 py-2 rounded w-48"
+            [(ngModel)]="filters.from"
+        />
+    </div>
+
+    <div>
+        <label class="text-sm text-gray-600">Hasta</label>
+        <input
+            type="date"
+            class="border px-3 py-2 rounded w-48"
+            [(ngModel)]="filters.to"
+        />
+    </div>
+
+    <div>
+        <label class="text-sm text-gray-600">Estado</label>
+        <select
+            class="border px-3 py-2 rounded w-48"
+            [(ngModel)]="filters.status"
+        >
+            <option value="ALL">Todos</option>
+            <option value="PAID">Pagado</option>
+            <option value="COMPLETED">Completado</option>
+        </select>
+    </div>
+
+    <button
+        class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+        (click)="applyFilters()"
+    >
+        Aplicar
+    </button>
+
+    <button
+        class="px-4 py-2 border rounded hover:bg-gray-100 transition"
+        (click)="resetFilters()"
+    >
+        Limpiar
+    </button>
+
+</div>
+
+<!-- ========================= -->
+<!-- LOADING -->
+<!-- ========================= -->
+<div *ngIf="loading" class="text-gray-500">
+    Cargando reporte de clientes...
+</div>
+
+<!-- ========================= -->
+<!-- KPIs -->
+<!-- ========================= -->
+<div *ngIf="report" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+
+    <div class="bg-white p-4 rounded shadow">
+        <p class="text-sm text-gray-500">Clientes totales</p>
+        <p class="text-xl font-bold">{{ report.summary.totalCustomers }}</p>
+    </div>
+
+    <div class="bg-white p-4 rounded shadow">
+        <p class="text-sm text-gray-500">Clientes activos</p>
+        <p class="text-xl font-bold">{{ report.summary.activeCustomers }}</p>
+    </div>
+
+    <div class="bg-white p-4 rounded shadow">
+        <p class="text-sm text-gray-500">Ingreso promedio por cliente</p>
+        <p class="text-xl font-bold">
+            S/ {{ report.summary.averageRevenuePerCustomer | number:'1.2-2' }}
+        </p>
+    </div>
+
+</div>
+
+<!-- ========================= -->
+<!-- TABLA -->
+<!-- ========================= -->
+<div *ngIf="report" class="bg-white rounded shadow p-4 mb-6">
+
+    <div class="flex justify-between items-center mb-3">
+        <h2 class="font-semibold">Detalle por cliente</h2>
+
+        <div class="flex gap-2">
+            <button
+                class="px-3 py-1 bg-gray-800 text-white rounded hover:bg-gray-700 transition text-sm"
+                (click)="exportPdf()"
+            >
+                Exportar PDF
+            </button>
+
+            <button
+                class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition text-sm"
+                (click)="exportExcel()"
+            >
+                Exportar Excel
+            </button>
+        </div>
+    </div>
+
+    <table class="w-full text-sm border">
+        <thead class="bg-gray-100">
+            <tr>
+                <th class="p-2 border">Cliente</th>
+                <th class="p-2 border">Email</th>
+                <th class="p-2 border">Órdenes</th>
+                <th class="p-2 border">Total Comprado</th>
+                <th class="p-2 border">Última compra</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr *ngFor="let c of report.rows">
+                <td class="p-2 border font-medium">
+                    {{ c.fullName }}
+                </td>
+                <td class="p-2 border">
+                    {{ c.email }}
+                </td>
+                <td class="p-2 border text-center">
+                    {{ c.totalOrders }}
+                </td>
+                <td class="p-2 border">
+                    S/ {{ c.totalSpent | number:'1.2-2' }}
+                </td>
+                <td class="p-2 border">
+                    {{ c.lastPurchase | date:'yyyy-MM-dd' }}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

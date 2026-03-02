@@ -1,0 +1,14 @@
+<div class="flex gap-3">
+    <input
+        [(ngModel)]="question"
+        placeholder="Escribe tu pregunta..."
+        class="flex-1 border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring"
+    />
+
+    <button
+        (click)="submit()"
+        class="bg-blue-600 text-white px-5 py-2 rounded-md text-sm font-medium hover:bg-blue-700"
+    >
+        Preguntar
+    </button>
+</div>

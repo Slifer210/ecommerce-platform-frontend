@@ -1,0 +1,66 @@
+<div>
+  <h2 class="font-semibold mb-2">Categorías</h2>
+
+  <!-- TODAS -->
+  <button
+    class="block w-full text-left px-2 py-1 rounded"
+    [class.bg-black]="!ui.tempCategoryId()"
+    [class.text-white]="!ui.tempCategoryId()"
+    (click)="selectCategory(null)"
+  >
+    Todas
+  </button>
+
+  <!-- ROOT CATEGORIES -->
+  <ng-container *ngFor="let c of rootCategories">
+    <div class="pl-1 mt-1">
+
+      <div class="flex items-center gap-2">
+
+        <!-- EXPAND -->
+        <button
+          *ngIf="!catalogState.isSearchActive()"
+          class="text-sm"
+          (click)="toggleCategory(c.id)"
+        >
+          {{ isExpanded(c.id) ? '▾' : '▸' }}
+        </button>
+
+        <!-- CATEGORY -->
+        <button
+          class="flex-1 text-left px-2 py-1 rounded"
+          [class.bg-black]="ui.tempCategoryId() === c.id"
+          [class.text-white]="ui.tempCategoryId() === c.id"
+          (click)="selectCategory(c.id)"
+        >
+          {{ c.name }}
+        </button>
+
+        <!-- FACET COUNT -->
+        <span
+          *ngIf="catalogState.isSearchActive()"
+          class="text-xs text-gray-500"
+        >
+          ({{ getFacetCount(c.id) }})
+        </span>
+
+      </div>
+
+      <!-- CHILD -->
+      <div
+        *ngIf="!catalogState.isSearchActive() && isExpanded(c.id)"
+        class="ml-6 mt-1 space-y-1"
+      >
+        <button
+          *ngFor="let child of categoryTree.get(c.id)"
+          class="block w-full text-left px-2 py-1 rounded text-sm"
+          [class.bg-gray-200]="ui.tempCategoryId() === child.id"
+          (click)="selectCategory(child.id)"
+        >
+          {{ child.name }}
+        </button>
+      </div>
+
+    </div>
+  </ng-container>
+</div>

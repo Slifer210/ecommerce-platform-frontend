@@ -1,0 +1,71 @@
+<div
+    class="fixed inset-0 bg-black/50 flex justify-center items-center z-50"
+    (click)="closeModal()"
+>
+    <div
+        class="bg-white w-96 rounded p-6"
+        (click)="$event.stopPropagation()"
+    >
+        <h2 class="text-lg font-bold mb-4">
+        Categorías del producto
+        </h2>
+
+        <!-- LOADING -->
+        <div *ngIf="loading" class="text-sm text-gray-500">
+        Cargando categorías...
+        </div>
+
+        <!-- LISTA -->
+        <div *ngIf="!loading" class="space-y-4 max-h-72 overflow-auto">
+
+        <!-- CATEGORÍAS PRINCIPALES -->
+        <div *ngFor="let parent of parentCategories">
+
+            <div class="font-semibold text-gray-800 flex items-center gap-2">
+            📁 {{ parent.name }}
+            </div>
+
+            <!-- SUBCATEGORÍAS -->
+            <div class="ml-6 mt-2 space-y-1">
+
+            <label
+                *ngFor="let child of getChildren(parent.id)"
+                class="flex items-center gap-2 cursor-pointer text-sm"
+            >
+                <input
+                type="checkbox"
+                [checked]="selected.has(child.id)"
+                (change)="toggle(child.id, $any($event.target).checked)"
+                />
+                {{ child.name }}
+            </label>
+
+            <div
+                *ngIf="getChildren(parent.id).length === 0"
+                class="text-xs text-gray-400 italic"
+            >
+                Sin subcategorías
+            </div>
+
+            </div>
+
+        </div>
+
+        <div *ngIf="parentCategories.length === 0" class="text-sm text-gray-400">
+            No hay categorías creadas.
+        </div>
+
+        </div>
+
+        <!-- BOTONES -->
+        <div class="flex justify-end mt-4">
+        <button
+            class="px-3 py-1 bg-gray-300 rounded"
+            (click)="closeModal()"
+        >
+            Cerrar
+        </button>
+        </div>
+
+    </div>
+</div>

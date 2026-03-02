@@ -1,0 +1,169 @@
+<h1 class="text-2xl font-bold mb-4">Órdenes</h1>
+
+<!-- FILTROS -->
+<div class="flex flex-wrap gap-3 mb-4 items-center">
+
+    <!-- BUSCADOR -->
+    <input
+        type="text"
+        placeholder="Buscar por ID..."
+        class="border px-3 py-2 rounded w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchChange()"
+    />
+
+    <!-- FILTRO ESTADO -->
+    <select
+        class="border px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+        [(ngModel)]="statusFilter"
+        (change)="applyFilters()"
+    >
+        <option value="ALL">Todos los estados</option>
+        <option value="PAID">Pagado</option>
+        <option value="SHIPPED">Enviado</option>
+        <option value="COMPLETED">Completado</option>
+    </select>
+
+    <!-- ORDEN -->
+    <button
+        class="px-3 py-2 border rounded bg-white hover:bg-gray-100 transition"
+        (click)="toggleSort()"
+    >
+        {{ sortOrder === 'DESC' ? 'Más recientes' : 'Más antiguos' }}
+    </button>
+
+    <!-- EXPORTAR -->
+    <div class="relative">
+        <button
+        class="px-3 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition"
+        (click)="toggleExportMenu()"
+        >
+        Exportar
+        </button>
+
+        <!-- MENU EXPORTAR -->
+        <div
+        *ngIf="showExportMenu"
+        class="absolute right-0 mt-2 w-56 bg-white border rounded shadow-lg z-40"
+        >
+        <button
+            class="w-full text-left px-4 py-2 hover:bg-gray-100 transition"
+            (click)="exportPdf(); closeExportMenu()"
+        >
+            Exportar PDF (vista actual)
+        </button>
+
+        <button
+            class="w-full text-left px-4 py-2 hover:bg-gray-100 transition"
+            (click)="exportExcel(); closeExportMenu()"
+        >
+            Exportar Excel (vista actual)
+        </button>
+
+        <button
+            class="w-full text-left px-4 py-2 hover:bg-gray-100 transition"
+            (click)="exportCsv(); closeExportMenu()"
+        >
+            Exportar CSV (vista actual)
+        </button>
+        </div>
+    </div>
+
+</div>
+
+<!-- LOADING -->
+<div *ngIf="loading" class="text-gray-500">
+    Cargando órdenes...
+</div>
+
+<!-- TABLA -->
+<table
+    *ngIf="!loading && filteredOrders.length > 0"
+    class="w-full border border-gray-300 text-sm bg-white"
+>
+    <thead class="bg-gray-100">
+        <tr>
+        <th class="p-2 border">ID</th>
+        <th class="p-2 border">Estado</th>
+        <th class="p-2 border">Total</th>
+        <th class="p-2 border">Fecha</th>
+        <th class="p-2 border">Acciones</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr *ngFor="let order of filteredOrders" class="hover:bg-gray-50">
+        <td class="p-2 border">{{ order.orderId }}</td>
+
+        <td class="p-2 border font-semibold">
+            {{ order.status }}
+        </td>
+
+        <td class="p-2 border">
+            S/ {{ order.total }}
+        </td>
+
+        <td class="p-2 border">
+            {{ order.createdAt | date:'short' }}
+        </td>
+
+        <td class="p-2 border space-x-2">
+            <button
+            *ngIf="order.status === 'PAID'"
+            class="px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+            (click)="ship(order.orderId)"
+            >
+            Enviar
+            </button>
+
+            <button
+            *ngIf="order.status === 'SHIPPED'"
+            class="px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition"
+            (click)="complete(order.orderId)"
+            >
+            Completar
+            </button>
+
+            <button
+            class="px-2 py-1 bg-gray-600 text-white rounded hover:bg-gray-700 transition"
+            (click)="viewHistory(order.orderId)"
+            >
+            Historial
+            </button>
+        </td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- SIN RESULTADOS -->
+<div *ngIf="!loading && filteredOrders.length === 0" class="text-gray-500">
+    No hay órdenes con esos filtros.
+</div>
+
+<!-- MODAL HISTORIAL -->
+<div
+    *ngIf="showHistoryModal"
+    class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50"
+>
+    <div class="bg-white p-4 rounded w-96 shadow-lg">
+        <h3 class="font-bold mb-3 text-lg">Historial de estados</h3>
+
+        <ul class="text-sm space-y-1">
+        <li *ngFor="let h of history" class="flex justify-between">
+            <span class="font-medium">{{ h.status }}</span>
+            <span class="text-gray-500">
+            {{ h.changedAt | date:'short' }}
+            </span>
+        </li>
+        </ul>
+
+        <div class="text-right">
+        <button
+            class="mt-4 px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition"
+            (click)="closeHistory()"
+        >
+            Cerrar
+        </button>
+        </div>
+    </div>
+</div>

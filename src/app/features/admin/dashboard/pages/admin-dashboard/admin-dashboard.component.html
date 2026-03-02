@@ -1,0 +1,91 @@
+<h1 class="text-2xl font-bold mb-6">Dashboard</h1>
+
+<div *ngIf="loading" class="text-gray-500">
+    Cargando dashboard...
+</div>
+
+<div *ngIf="dashboard">
+
+    <!-- KPIs -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+
+        <div class="bg-white p-4 rounded shadow">
+        <p class="text-sm text-gray-500">Ventas totales</p>
+        <p class="text-xl font-bold">S/ {{ dashboard.stats.totalSales }}</p>
+        </div>
+
+        <div class="bg-white p-4 rounded shadow">
+        <p class="text-sm text-gray-500">Órdenes hoy</p>
+        <p class="text-xl font-bold">{{ dashboard.stats.ordersToday }}</p>
+        </div>
+
+        <div class="bg-white p-4 rounded shadow">
+        <p class="text-sm text-gray-500">Pendientes</p>
+        <p class="text-xl font-bold">{{ dashboard.stats.pendingOrders }}</p>
+        </div>
+
+        <div class="bg-white p-4 rounded shadow">
+        <p class="text-sm text-gray-500">Productos activos</p>
+        <p class="text-xl font-bold">{{ dashboard.stats.activeProducts }}</p>
+        </div>
+
+    </div>
+
+    <app-sales-chart
+        *ngIf="dashboard.salesChart?.length"
+        [data]="dashboard.salesChart">
+    </app-sales-chart>
+
+    <!-- RESUMEN ESTADOS -->
+    <div class="bg-white rounded shadow p-4 mb-6">
+        <h2 class="font-semibold mb-3">Órdenes por estado</h2>
+
+        <div class="flex gap-4 text-sm">
+        <span>🟦 PAID: {{ dashboard.orderStatus.paid }}</span>
+        <span>🟨 SHIPPED: {{ dashboard.orderStatus.shipped }}</span>
+        <span>🟩 COMPLETED: {{ dashboard.orderStatus.completed }}</span>
+        <span>🟥 CANCELLED: {{ dashboard.orderStatus.cancelled }}</span>
+        </div>
+    </div>
+
+    <div class="bg-white rounded shadow p-4 mb-6">
+        <h2 class="font-semibold mb-3">Actividad reciente</h2>
+
+        <ul class="text-sm space-y-2">
+        <li *ngFor="let a of dashboard.activityLogs">
+            <span class="text-gray-500">
+            {{ a.createdAt | date:'short' }}
+            </span>
+            — {{ a.message }}
+        </li>
+        </ul>
+    </div>
+
+    <!-- ÚLTIMAS ÓRDENES -->
+    <div class="bg-white rounded shadow p-4">
+        <h2 class="font-semibold mb-3">Últimas órdenes</h2>
+
+        <table class="w-full text-sm border">
+        <thead class="bg-gray-100">
+            <tr>
+            <th class="p-2 border">ID</th>
+            <th class="p-2 border">Estado</th>
+            <th class="p-2 border">Total</th>
+            <th class="p-2 border">Fecha</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr *ngFor="let o of dashboard.recentOrders">
+            <td class="p-2 border">{{ o.id | slice:0:8 }}...</td>
+            <td class="p-2 border font-semibold">{{ o.status }}</td>
+            <td class="p-2 border">S/ {{ o.total }}</td>
+            <td class="p-2 border">
+                {{ o.createdAt | date:'short' }}
+            </td>
+            </tr>
+        </tbody>
+        </table>
+    </div>
+
+</div>

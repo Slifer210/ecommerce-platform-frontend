@@ -1,0 +1,126 @@
+<div class="flex items-center gap-6">
+
+    <!-- ========================= -->
+    <!-- CARRITO -->
+    <!-- ========================= -->
+    <a
+    routerLink="/cart"
+    class="relative flex flex-col items-center hover:text-black text-gray-700"
+    >
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6"
+        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.3 5.2A1 1 0 007 19h10a1 1 0 001-.8L20 13M7 13h10" />
+    </svg>
+
+    <span>Carrito</span>
+
+    <span
+        *ngIf="cartState.itemCount() > 0"
+        class="absolute -top-2 -right-2 bg-black text-white text-xs rounded-full px-1.5"
+    >
+        {{ cartState.itemCount() }}
+    </span>
+    </a>
+
+    <!-- ========================= -->
+    <!-- NO AUTENTICADO -->
+    <!-- ========================= -->
+    <ng-container *ngIf="!authState.isAuthenticated(); else logged">
+
+    <a
+        routerLink="/auth/login"
+        class="flex flex-col items-center text-gray-700 hover:text-black"
+    >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6"
+            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M5.121 17.804A9 9 0 1118.364 4.636M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        <span>Ingresar</span>
+    </a>
+
+    </ng-container>
+
+    <!-- ========================= -->
+    <!-- AUTENTICADO -->
+    <!-- ========================= -->
+    <ng-template #logged>
+
+        <!-- PERFIL -->
+        <a
+            routerLink="/profile"
+            class="flex flex-col items-center text-gray-700 hover:text-black"
+        >
+            <ng-container *ngIf="profileImageUrl; else avatar">
+            <img
+                [src]="profileImageUrl"
+                class="h-8 w-8 rounded-full object-cover border"
+            />
+            </ng-container>
+
+            <ng-template #avatar>
+            <svg xmlns="http://www.w3.org/2000/svg"
+                class="h-8 w-8 text-gray-400"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M5.121 17.804A9 9 0 1118.364 4.636M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            </ng-template>
+
+            <span class="text-[11px]">Perfil</span>
+        </a>
+
+        <!-- ÓRDENES -->
+        <a
+            routerLink="/my-orders"
+            class="flex flex-col items-center text-gray-700 hover:text-black"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 5h6M9 9h6M9 13h6M5 5h.01M5 9h.01M5 13h.01" />
+            </svg>
+            <span>Órdenes</span>
+        </a>
+
+        <!-- NOTIFICACIONES -->
+        <app-notification-dropdown></app-notification-dropdown>
+
+        <!-- DIRECCIÓN -->
+        <a
+            routerLink="/addresses"
+            class="flex flex-col items-center text-gray-700 hover:text-black"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 11c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 21s8-4.5 8-10A8 8 0 104 11c0 5.5 8 10 8 10z" />
+            </svg>
+
+            <span class="text-[11px] text-gray-500">
+            {{ addressState.summary() }}
+            </span>
+        </a>
+
+        <!-- LOGOUT -->
+        <button
+            (click)="logout()"
+            class="flex flex-col items-center text-gray-700 hover:text-red-600"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M17 16l4-4m0 0l-4-4m4 4H7" />
+            </svg>
+            <span>Salir</span>
+        </button>
+
+    </ng-template>
+
+
+
+</div>
+    

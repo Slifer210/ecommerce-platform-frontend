@@ -1,0 +1,97 @@
+<div class="review-form bg-gray-50 border rounded-lg p-4 space-y-3 max-w-md">
+
+  <h4 class="text-sm font-semibold text-gray-700">
+    Tu opinión
+  </h4>
+
+  <!-- STARS -->
+  <div class="flex items-center gap-1">
+    <ng-container *ngFor="let star of [1,2,3,4,5]">
+      <label class="cursor-pointer">
+        <input
+          type="radio"
+          name="rating"
+          [value]="star"
+          [(ngModel)]="rating"
+          class="hidden"
+        />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="currentColor"
+          viewBox="0 0 24 24"
+          class="w-6 h-6 transition-colors"
+          [class.text-yellow-400]="rating >= star"
+          [class.text-gray-300]="rating < star"
+        >
+          <path
+            d="M12 .587l3.668 7.431 8.2 1.192-5.934 5.786 
+               1.402 8.174L12 18.897l-7.336 3.873 
+               1.402-8.174L.132 9.21l8.2-1.192z"
+          />
+        </svg>
+      </label>
+    </ng-container>
+  </div>
+
+  <!-- COMMENT -->
+  <textarea
+    [(ngModel)]="comment"
+    rows="3"
+    class="w-full text-sm border rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+    placeholder="¿Qué te pareció el producto?"
+  ></textarea>
+
+  <!-- IMAGES -->
+  <div class="space-y-2">
+    <label class="text-xs text-gray-600 font-medium">
+      Agregar fotos (máx. 3)
+    </label>
+
+    <input
+      type="file"
+      accept="image/*"
+      (change)="uploadImage($event)"
+      [disabled]="images.length >= 3 || uploading"
+      class="block text-sm"
+    />
+
+    <div *ngIf="uploading" class="text-xs text-gray-500">
+      Subiendo imagen...
+    </div>
+
+    <!-- PREVIEW -->
+    <div class="flex gap-2 flex-wrap">
+      <div
+        *ngFor="let img of images; let i = index"
+        class="relative w-20 h-20 border rounded"
+      >
+        <img
+          [src]="img"
+          class="w-full h-full object-cover rounded"
+        />
+
+        <button
+          type="button"
+          class="absolute -top-2 -right-2 bg-red-600 text-white
+                 text-xs w-5 h-5 rounded-full"
+          (click)="removeImage(i)"
+        >
+          ✕
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTION -->
+  <div class="flex justify-end">
+    <button
+      (click)="submit()"
+      [disabled]="!rating || !comment || uploading"
+      class="px-4 py-1.5 text-sm rounded-md text-white
+             bg-blue-600 hover:bg-blue-700
+             disabled:bg-gray-300 disabled:cursor-not-allowed">
+      Enviar
+    </button>
+  </div>
+
+</div>

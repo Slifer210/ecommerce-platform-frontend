@@ -1,0 +1,71 @@
+<h1 class="text-2xl font-bold mb-2">Reportes</h1>
+<p class="text-gray-600 mb-6">
+    Analiza el rendimiento del negocio, tendencias y resultados históricos.
+</p>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    <!-- ========================= -->
+    <!-- VENTAS -->
+    <!-- ========================= -->
+    <div
+        routerLink="/admin/reports/sales"
+        class="bg-white p-6 rounded shadow hover:shadow-lg cursor-pointer transition border-l-4 border-blue-500"
+    >
+        <div class="flex items-center gap-3 mb-3">
+        <span class="text-3xl">📈</span>
+        <h2 class="text-lg font-semibold">Ventas</h2>
+        </div>
+
+        <p class="text-sm text-gray-600">
+        Analiza ingresos, órdenes y tendencias por fecha.
+        </p>
+
+        <div class="mt-4 text-blue-600 text-sm font-medium">
+        Ver reporte →
+        </div>
+    </div>
+
+    <!-- ========================= -->
+    <!-- CLIENTES -->
+    <!-- ========================= -->
+    <div
+        routerLink="/admin/reports/customers"
+        class="bg-white p-6 rounded shadow hover:shadow-lg cursor-pointer transition border-l-4 border-green-500"
+    >
+        <div class="flex items-center gap-3 mb-3">
+        <span class="text-3xl">🧑‍🤝‍🧑</span>
+        <h2 class="text-lg font-semibold">Clientes</h2>
+        </div>
+
+        <p class="text-sm text-gray-600">
+        Descubre clientes frecuentes y comportamiento de compra.
+        </p>
+
+        <div class="mt-4 text-green-600 text-sm font-medium">
+        Ver reporte →
+        </div>
+    </div>
+
+    <!-- ========================= -->
+    <!-- PRODUCTOS -->
+    <!-- ========================= -->
+    <div
+        routerLink="/admin/reports/products"
+        class="bg-white p-6 rounded shadow hover:shadow-lg cursor-pointer transition border-l-4 border-purple-500"
+    >
+        <div class="flex items-center gap-3 mb-3">
+        <span class="text-3xl">📦</span>
+        <h2 class="text-lg font-semibold">Productos</h2>
+        </div>
+
+        <p class="text-sm text-gray-600">
+        Revisa los productos más vendidos y su rendimiento.
+        </p>
+
+        <div class="mt-4 text-purple-600 text-sm font-medium">
+        Ver reporte →
+        </div>
+    </div>
+
+</div>

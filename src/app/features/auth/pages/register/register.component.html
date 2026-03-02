@@ -1,0 +1,90 @@
+<app-auth-layout>
+
+    <div class="flex flex-col items-center mb-8">
+        <h1 class="text-[#0d131b] tracking-tight text-[32px] font-bold leading-tight text-center pb-2">
+        Registro
+        </h1>
+        <p class="text-[#4c6c9a] text-sm font-normal text-center">
+        Crea tu cuenta para comenzar
+        </p>
+    </div>
+
+    <form
+        [formGroup]="form"
+        (ngSubmit)="submit()"
+        class="flex flex-col gap-5"
+    >
+
+        <div class="flex flex-col gap-2">
+        <label class="text-[#0d131b] text-base font-medium">
+            Nombres
+        </label>
+        <input
+            type="text"
+            formControlName="firstName"
+            placeholder="Nombres"
+            class="form-input w-full h-14 rounded-lg border border-[#cfd9e7]
+                bg-white p-[15px] text-base placeholder:text-[#4c6c9a]
+                focus:ring-2 focus:ring-[#136dec]/20 focus:border-[#136dec]"
+        />
+        </div>
+
+        <div class="flex flex-col gap-2">
+        <label class="text-[#0d131b] text-base font-medium">
+            Apellidos
+        </label>
+        <input
+            type="text"
+            formControlName="lastName"
+            placeholder="Apellidos"
+            class="form-input w-full h-14 rounded-lg border border-[#cfd9e7]
+                bg-white p-[15px] text-base placeholder:text-[#4c6c9a]
+                focus:ring-2 focus:ring-[#136dec]/20 focus:border-[#136dec]"
+        />
+        </div>
+
+        <div class="flex flex-col gap-2">
+        <label class="text-[#0d131b] text-base font-medium">
+            Correo electrónico
+        </label>
+        <input
+            type="email"
+            formControlName="email"
+            placeholder="ejemplo@correo.com"
+            class="form-input w-full h-14 rounded-lg border border-[#cfd9e7]
+                bg-white p-[15px] text-base placeholder:text-[#4c6c9a]
+                focus:ring-2 focus:ring-[#136dec]/20 focus:border-[#136dec]"
+        />
+        </div>
+
+        <div class="flex flex-col gap-2">
+        <label class="text-[#0d131b] text-base font-medium">
+            Contraseña
+        </label>
+        <input
+            type="password"
+            formControlName="password"
+            placeholder="••••••••"
+            class="form-input w-full h-14 rounded-lg border border-[#cfd9e7]
+                bg-white p-[15px] text-base placeholder:text-[#4c6c9a]
+                focus:ring-2 focus:ring-[#136dec]/20 focus:border-[#136dec]"
+        />
+        </div>
+
+        <button
+        type="submit"
+        [disabled]="form.invalid || loading"
+        class="w-full h-14 rounded-lg bg-[#136dec] text-white
+                font-bold shadow-md hover:bg-[#136dec]/90
+                disabled:opacity-50"
+        >
+        Registrar
+        </button>
+
+    </form>
+
+    <p *ngIf="success" class="mt-6 text-center text-sm font-medium text-green-600">
+        Registro exitoso. Revisa tu correo para verificar tu cuenta.
+    </p>
+
+</app-auth-layout>

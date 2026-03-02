@@ -1,0 +1,46 @@
+<!-- ===================== -->
+<!-- ATRIBUTOS DINÁMICOS -->
+<!-- ===================== -->
+<div *ngIf="facetAttributes.length > 0" class="space-y-5">
+
+    <div *ngFor="let attr of facetAttributes" class="space-y-2">
+
+        <!-- TÍTULO DEL ATRIBUTO -->
+        <h3 class="text-sm font-semibold text-gray-900 capitalize">
+        {{ attr.name }}
+        </h3>
+
+        <!-- VALORES -->
+        <div class="space-y-1">
+
+        <label
+            *ngFor="let v of attr.values"
+            class="flex items-center justify-between
+                cursor-pointer
+                rounded-md px-2 py-1
+                text-sm text-gray-700
+                hover:bg-gray-100
+                transition-colors"
+        >
+            <div class="flex items-center gap-2">
+            <input
+                type="checkbox"
+                class="h-4 w-4 rounded border-gray-300
+                    text-black
+                    focus:ring-black"
+                [checked]="isChecked(attr.name, v.value)"
+                (change)="onToggle(attr.name, v.value)"
+            />
+            <span>{{ v.value }}</span>
+            </div>
+
+            <span class="text-xs text-gray-500">
+            {{ v.count }}
+            </span>
+        </label>
+
+        </div>
+
+    </div>
+
+</div>

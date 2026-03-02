@@ -1,0 +1,35 @@
+<div class="max-w-2xl mx-auto p-6">
+
+    <h1 class="text-xl font-semibold mb-4">
+        Todas las notificaciones
+    </h1>
+
+    <!-- Lista vacía -->
+    <div
+        *ngIf="notificationState.allNotifications().length === 0"
+        class="text-gray-500"
+    >
+        No tienes notificaciones.
+    </div>
+
+    <!-- Lista -->
+    <div
+        *ngFor="let n of notificationState.allNotifications()"
+        class="border-b py-3 cursor-pointer"
+        [class.font-semibold]="!n.read"
+        (click)="open(n)"
+    >
+        <div class="text-sm text-gray-800">
+        {{ n.title }}
+        </div>
+
+        <div class="text-xs text-gray-600">
+        {{ n.message }}
+        </div>
+
+        <div class="text-[10px] text-gray-400 mt-1">
+        {{ n.createdAt | date:'short' }}
+        </div>
+    </div>
+
+</div>

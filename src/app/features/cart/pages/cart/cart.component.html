@@ -1,0 +1,106 @@
+<div class="max-w-3xl mx-auto p-6 space-y-6">
+
+    <h1 class="text-2xl font-bold">
+        Tu carrito
+    </h1>
+
+    <!-- SKELETON LOADING -->
+    <div *ngIf="cartState.loading()" class="space-y-4">
+        <div
+        *ngFor="let _ of [1,2,3]"
+        class="h-16 bg-gray-200 rounded animate-pulse"
+        ></div>
+    </div>
+
+    <!-- CONTENT -->
+    <ng-container *ngIf="!cartState.loading() && cartState.cart() as cart">
+
+        <!-- EMPTY -->
+        <div
+        *ngIf="cart.items.length === 0"
+        class="text-center text-gray-500"
+        >
+        Tu carrito está vacío 🛒
+        </div>
+
+        <!-- ITEMS -->
+        <div
+        *ngIf="cart.items.length > 0"
+        class="space-y-4"
+        >
+
+        <div
+            *ngFor="let item of cart.items"
+            class="flex justify-between items-center border-b py-3"
+        >
+            <div>
+            <div class="font-semibold">
+                {{ item.productName }}
+            </div>
+            <div class="text-sm text-gray-600">
+                S/ {{ item.unitPrice }} c/u
+            </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+            <!-- DECREASE -->
+            <button
+                class="px-2 py-1 border rounded disabled:opacity-50"
+                [disabled]="item.quantity === 1"
+                (click)="decrease(item.productId)"
+                >
+                −
+            </button>
+
+            <span class="min-w-[24px] text-center">
+                {{ item.quantity }}
+            </span>
+
+            <!-- INCREASE -->
+            <button
+                class="px-2 py-1 border rounded"
+                (click)="increase(item.productId)"
+            >
+                +
+            </button>
+
+            <div class="font-bold ml-4">
+                S/ {{ item.totalPrice }}
+            </div>
+
+            <button
+                class="text-red-600 text-sm ml-4"
+                (click)="removeItem(item.productId)"
+            >
+                Quitar
+            </button>
+            </div>
+        </div>
+
+        <!-- TOTAL -->
+        <div class="mt-6 flex justify-between font-bold text-lg">
+            <span>Total</span>
+            <span>S/ {{ cart.totalAmount }}</span>
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="mt-6 flex gap-4">
+            <button
+            class="bg-gray-200 px-4 py-2 rounded"
+            (click)="clearCart()"
+            >
+            Vaciar carrito
+            </button>
+
+            <button
+            class="bg-black text-white px-4 py-2 rounded disabled:opacity-50"
+            [disabled]="cart.items.length === 0"
+            (click)="goToCheckout()"
+            >
+            Continuar al pago
+            </button>
+        </div>
+
+        </div>
+    </ng-container>
+</div>

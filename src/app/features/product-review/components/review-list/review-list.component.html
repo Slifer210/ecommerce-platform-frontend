@@ -1,0 +1,56 @@
+
+<app-review-summary [productId]="productId"></app-review-summary>
+
+<div class="space-y-6">
+
+    <div *ngFor="let review of reviews" class="border-b pb-4">
+
+        <!-- Header -->
+        <div class="flex justify-between items-start">
+        <div>
+            <app-rating-stars [rating]="review.rating"></app-rating-stars>
+
+            <div class="text-sm text-gray-600 mt-1">
+            {{ review.userName }}
+            </div>
+        </div>
+
+        <div class="text-xs text-gray-400">
+            {{ review.createdAt | date:'dd MMM yyyy' }}
+        </div>
+        </div>
+
+        <!-- IMÁGENES DE LA RESEÑA -->
+        <div
+        *ngIf="review.images?.length"
+        class="mt-3 flex gap-2 flex-wrap"
+        >
+        <img
+            *ngFor="let img of review.images"
+            [src]="img.imageUrl"
+            class="w-24 h-24 object-cover rounded border cursor-pointer
+                hover:opacity-90"
+        />
+        </div>
+
+        <!-- Comment -->
+        <p class="mt-2 text-gray-800">
+        {{ review.comment }}
+        </p>
+
+        <!-- Actions -->
+        <div class="mt-3">
+        <app-review-vote
+            [review]="review"
+            (voted)="loadReviews()">
+        </app-review-vote>
+        </div>
+    </div>
+
+    <button
+        *ngIf="page + 1 < totalPages"
+        (click)="nextPage()"
+        class="text-blue-600 text-sm hover:underline">
+        Cargar más opiniones
+    </button>
+</div>

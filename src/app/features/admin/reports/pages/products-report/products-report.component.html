@@ -1,0 +1,175 @@
+<h1 class="text-2xl font-bold mb-2">Reporte de Productos</h1>
+<p class="text-gray-600 mb-6">
+    Revisa los productos más vendidos y su rendimiento.
+</p>
+
+<!-- ========================= -->
+<!-- FILTROS -->
+<!-- ========================= -->
+<div class="bg-white p-4 rounded shadow mb-6 flex flex-wrap gap-4 items-end">
+
+    <div>
+        <label class="text-sm text-gray-600">Desde</label>
+        <input
+            type="date"
+            class="border px-3 py-2 rounded w-48"
+            [(ngModel)]="filters.from"
+        />
+    </div>
+
+    <div>
+        <label class="text-sm text-gray-600">Hasta</label>
+        <input
+            type="date"
+            class="border px-3 py-2 rounded w-48"
+            [(ngModel)]="filters.to"
+        />
+    </div>
+
+    <div>
+        <label class="text-sm text-gray-600">Estado</label>
+        <select
+            class="border px-3 py-2 rounded w-48"
+            [(ngModel)]="filters.status"
+        >
+            <option value="ALL">Todos</option>
+            <option value="PAID">Pagado</option>
+            <option value="COMPLETED">Completado</option>
+        </select>
+    </div>
+
+    <button
+        class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
+        (click)="applyFilters()"
+    >
+        Aplicar
+    </button>
+
+    <button
+        class="px-4 py-2 border rounded hover:bg-gray-100 transition"
+        (click)="resetFilters()"
+    >
+        Limpiar
+    </button>
+
+</div>
+
+<!-- ========================= -->
+<!-- LOADING -->
+<!-- ========================= -->
+<div *ngIf="loading" class="text-gray-500">
+    Cargando reporte de productos...
+</div>
+
+<!-- ========================= -->
+<!-- KPIs -->
+<!-- ========================= -->
+<div *ngIf="report" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+
+    <div class="bg-white p-4 rounded shadow">
+        <p class="text-sm text-gray-500">Productos vendidos</p>
+        <p class="text-xl font-bold">{{ report.summary.totalProducts }}</p>
+    </div>
+
+    <div class="bg-white p-4 rounded shadow">
+        <p class="text-sm text-gray-500">Ingresos totales</p>
+        <p class="text-xl font-bold">S/ {{ report.summary.totalRevenue }}</p>
+    </div>
+
+    <div class="bg-white p-4 rounded shadow">
+        <p class="text-sm text-gray-500">Producto más vendido</p>
+        <p class="text-lg font-semibold">
+            {{ report.summary.topProductName || '—' }}
+        </p>
+    </div>
+
+</div>
+
+<!-- ========================= -->
+<!-- TABLA -->
+<!-- ========================= -->
+<div *ngIf="report" class="bg-white rounded shadow p-4 mb-6">
+
+    <div class="flex justify-between items-center mb-3">
+        <h2 class="font-semibold">Detalle por producto</h2>
+
+        <div class="flex gap-2">
+        <button
+            class="px-3 py-1 bg-gray-800 text-white rounded hover:bg-gray-700 transition text-sm"
+            (click)="exportPdf()"
+        >
+            Exportar PDF
+        </button>
+
+        <button
+            class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition text-sm"
+            (click)="exportExcel()"
+        >
+            Exportar Excel
+        </button>
+        </div>
+    </div>
+
+    <table class="w-full text-sm border">
+        <thead class="bg-gray-100">
+        <tr>
+            <th class="p-2 border">Producto</th>
+            <th class="p-2 border">Categoría</th>
+            <th class="p-2 border">Precio</th>
+            <th class="p-2 border">Stock</th>
+            <th class="p-2 border">Reservado</th>
+            <th class="p-2 border">Vendidos</th>
+            <th class="p-2 border">Ingresos</th>
+            <th class="p-2 border">Última venta</th>
+            <th class="p-2 border">Estado</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr *ngFor="let r of report.rows">
+            <td class="p-2 border font-medium">
+            {{ r.productName }}
+            </td>
+
+            <td class="p-2 border">
+            {{ r.category }}
+            </td>
+
+            <td class="p-2 border">
+            S/ {{ r.currentPrice | number:'1.2-2' }}
+            </td>
+
+            <td class="p-2 border">
+            {{ r.stock }}
+            </td>
+
+            <td class="p-2 border">
+            {{ r.reservedStock }}
+            </td>
+
+            <td class="p-2 border">
+            {{ r.totalQuantity }}
+            </td>
+
+            <td class="p-2 border">
+            S/ {{ r.totalRevenue | number:'1.2-2' }}
+            </td>
+
+            <td class="p-2 border">
+            {{ r.lastSale | date:'short' }}
+            </td>
+
+            <td class="p-2 border">
+            <span
+                class="font-semibold"
+                [class.text-green-600]="r.active"
+                [class.text-red-600]="!r.active"
+            >
+                {{ r.active ? 'Activo' : 'Inactivo' }}
+            </span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+

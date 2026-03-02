@@ -1,0 +1,195 @@
+<div class="max-w-5xl mx-auto p-6 space-y-6">
+
+    <!-- HEADER -->
+    <div class="flex justify-between items-center">
+        <h1 class="text-2xl font-bold">
+        Detalle de la orden
+        </h1>
+        <button
+        class="text-sm text-blue-600 hover:underline"
+        (click)="goBack()">
+        ← Volver
+        </button>
+    </div>
+
+    <!-- LOADING -->
+    <div *ngIf="loading()" class="flex items-center gap-3 text-gray-500">
+        <span
+        class="inline-block w-5 h-5 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin">
+        </span>
+        Cargando orden...
+    </div>
+
+    <!-- CONTENT -->
+    <ng-container *ngIf="!loading() && order() as o">
+
+        <!-- RESUMEN -->
+        <div class="bg-white border rounded p-4 grid grid-cols-2 gap-4">
+        <div>
+            <div class="text-sm text-gray-500">Orden</div>
+            <div class="font-semibold">{{ o.orderId }}</div>
+        </div>
+
+        <div>
+            <div class="text-sm text-gray-500">Estado</div>
+            <div class="font-semibold">
+            {{ statusLabel(o.status) }}
+            </div>
+        </div>
+
+        <div>
+            <div class="text-sm text-gray-500">Fecha</div>
+            <div>{{ o.createdAt | date:'medium' }}</div>
+        </div>
+
+        <div *ngIf="o.paidAt">
+            <div class="text-sm text-gray-500">Pagado el</div>
+            <div>{{ o.paidAt | date:'medium' }}</div>
+        </div>
+        </div>
+
+        <!-- CONFIRMANDO PAGO -->
+        <div
+        *ngIf="o.status === 'PROCESSING'"
+        class="bg-blue-50 border border-blue-200 rounded p-4 mt-4 flex gap-4 items-start">
+
+        <!-- Spinner -->
+        <span
+            class="mt-1 inline-block w-6 h-6 border-2 border-blue-300 border-t-blue-600 rounded-full animate-spin">
+        </span>
+
+        <!-- Texto -->
+        <div>
+            <p class="font-medium text-blue-900">
+            Estamos confirmando tu pago
+            </p>
+            <p class="text-sm text-blue-800 mt-1">
+            Este proceso puede tardar unos segundos.  
+            No cierres esta página ni intentes pagar nuevamente.
+            </p>
+        </div>
+        </div>
+
+        <!-- COMPROBANTE (SOLO CUANDO ESTÁ PAGADO) -->
+        <div
+        *ngIf="o.status === 'PAID'"
+        class="bg-green-50 border border-green-200 rounded p-4 mt-4">
+
+        <p class="text-sm text-green-800">
+            El pago fue confirmado correctamente.  
+            Ya puedes descargar el comprobante de tu compra.
+        </p>
+
+        <button
+            class="mt-3 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+            (click)="downloadReceipt()">
+            Descargar comprobante
+        </button>
+        </div>
+
+        <!-- ITEMS -->
+        <div class="bg-white border rounded p-4 space-y-4">
+            <h2 class="font-semibold">
+                Productos ({{ totalItems() }})
+            </h2>
+        <div
+            *ngFor="let item of o.items"
+            class="border-b py-4 last:border-0 space-y-2">
+
+            <!-- Info producto -->
+            <div class="flex justify-between">
+            <div>
+                <div class="font-medium">
+                {{ item.productName }}
+                </div>
+                <div class="text-sm text-gray-500">
+                {{ item.quantity }} × S/ {{ item.unitPrice }}
+                </div>
+            </div>
+
+            <div class="font-semibold">
+                S/ {{ item.total | number:'1.2-2' }}
+            </div>
+            </div>
+
+            <!-- REVIEW ZONE -->
+            <ng-container *ngIf="o.status === 'COMPLETED'">
+
+            <!-- Ya reseñado -->
+            <div
+                *ngIf="item.reviewed"
+                class="text-sm text-green-700 font-medium">
+                ✔ Reseña enviada
+            </div>
+
+            <!-- Botón escribir -->
+            <button
+                *ngIf="!item.reviewed && !item.showReviewForm"
+                class="text-sm text-blue-600 hover:underline"
+                (click)="item.showReviewForm = true">
+                Escribir reseña
+            </button>
+
+            <!-- Formulario -->
+            <app-review-form
+                *ngIf="item.showReviewForm"
+                [productId]="item.productId"
+                [orderItemId]="item.id">
+            </app-review-form>
+
+            </ng-container>
+
+        </div>
+
+        <div class="flex justify-between font-bold pt-4 border-t">
+            <span>Total</span>
+            <span>S/ {{ o.total | number:'1.2-2' }}</span>
+        </div>
+        </div>
+
+
+        <!-- TIMELINE PROGRESIVO -->
+        <div class="bg-white border rounded p-6 space-y-6">
+        <h2 class="font-semibold text-lg">
+            Seguimiento del pedido
+        </h2>
+
+        <!-- Barra -->
+        <div class="relative">
+            <!-- Línea base -->
+            <div class="h-1 bg-gray-200 rounded"></div>
+
+            <!-- Progreso -->
+            <div
+            class="h-1 bg-green-600 rounded absolute top-0 left-0 transition-all duration-500"
+            [style.width.%]="progressPercent()">
+            </div>
+
+            <!-- Steps -->
+            <div class="flex justify-between mt-4">
+            <div
+                *ngFor="let status of orderFlow"
+                class="flex flex-col items-center text-center w-full">
+
+                <div
+                class="w-4 h-4 rounded-full border-2 transition-all duration-300"
+                [class.bg-green-600]="isActive(status)"
+                [class.border-green-600]="isActive(status)"
+                [class.bg-white]="!isActive(status)"
+                [class.border-gray-300]="!isActive(status)">
+                </div>
+
+                <div
+                class="text-xs mt-2"
+                [class.font-semibold]="isCurrent(status)"
+                [class.text-green-700]="isActive(status)"
+                [class.text-gray-400]="!isActive(status)">
+                {{ statusLabel(status) }}
+                </div>
+            </div>
+            </div>
+        </div>
+        </div>
+
+    </ng-container>
+</div>

@@ -1,0 +1,173 @@
+<h1 class="text-2xl font-bold mb-2">Reporte de Ventas</h1>
+<p class="text-gray-600 mb-6">
+    Analiza órdenes, clientes e ingresos por rango de fechas.
+</p>
+
+<!-- ========================= -->
+<!-- FILTROS -->
+<!-- ========================= -->
+<div class="bg-white p-4 rounded shadow mb-6 flex flex-wrap gap-4 items-end">
+
+    <div>
+        <label class="text-sm text-gray-600">Desde</label>
+        <input
+        type="date"
+        class="border px-3 py-2 rounded w-48"
+        [(ngModel)]="filters.from"
+        />
+    </div>
+
+    <div>
+        <label class="text-sm text-gray-600">Hasta</label>
+        <input
+        type="date"
+        class="border px-3 py-2 rounded w-48"
+        [(ngModel)]="filters.to"
+        />
+    </div>
+
+    <div>
+        <label class="text-sm text-gray-600">Estado</label>
+        <select
+        class="border px-3 py-2 rounded w-48"
+        [(ngModel)]="filters.status"
+        >
+        <option value="ALL">Todos</option>
+        <option value="PAID">Pagado</option>
+        <option value="COMPLETED">Completado</option>
+        </select>
+    </div>
+
+    <button
+        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+        (click)="applyFilters()"
+    >
+        Aplicar
+    </button>
+
+    <button
+        class="px-4 py-2 border rounded hover:bg-gray-100 transition"
+        (click)="resetFilters()"
+    >
+        Limpiar
+    </button>
+
+    </div>
+
+    <!-- ========================= -->
+    <!-- LOADING -->
+    <!-- ========================= -->
+    <div *ngIf="loading" class="text-gray-500">
+    Cargando reporte de ventas...
+    </div>
+
+    <!-- ========================= -->
+    <!-- KPIs -->
+    <!-- ========================= -->
+    <div *ngIf="report" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+
+    <div class="bg-white p-4 rounded shadow">
+        <p class="text-sm text-gray-500">Ingresos totales</p>
+        <p class="text-xl font-bold">
+        S/ {{ report.summary.totalRevenue | number:'1.2-2' }}
+        </p>
+    </div>
+
+    <div class="bg-white p-4 rounded shadow">
+        <p class="text-sm text-gray-500">Órdenes</p>
+        <p class="text-xl font-bold">{{ report.summary.totalOrders }}</p>
+    </div>
+
+    <div class="bg-white p-4 rounded shadow">
+        <p class="text-sm text-gray-500">Ticket promedio</p>
+        <p class="text-xl font-bold">
+        S/ {{ report.summary.averageTicket | number:'1.2-2' }}
+        </p>
+    </div>
+
+    <div class="bg-white p-4 rounded shadow">
+        <p class="text-sm text-gray-500">Ítems por orden</p>
+        <p class="text-xl font-bold">
+        {{ report.summary.averageItemsPerOrder | number:'1.1-1' }}
+        </p>
+    </div>
+
+</div>
+
+<!-- ========================= -->
+<!-- TABLA -->
+<!-- ========================= -->
+<div *ngIf="report" class="bg-white rounded shadow p-4 mb-6">
+
+    <div class="flex justify-between items-center mb-3">
+        <h2 class="font-semibold">Detalle de órdenes</h2>
+
+        <div class="flex gap-2">
+        <button
+            class="px-3 py-1 bg-gray-800 text-white rounded hover:bg-gray-700 transition text-sm"
+            (click)="exportPdf()"
+        >
+            Exportar PDF
+        </button>
+
+        <button
+            class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition text-sm"
+            (click)="exportExcel()"
+        >
+            Exportar Excel
+        </button>
+        </div>
+    </div>
+
+    <table class="w-full text-sm border">
+        <thead class="bg-gray-100">
+        <tr>
+            <th class="p-2 border">Orden</th>
+            <th class="p-2 border">Fecha</th>
+            <th class="p-2 border">Cliente</th>
+            <th class="p-2 border">Productos</th>
+            <th class="p-2 border">Ítems</th>
+            <th class="p-2 border">Total</th>
+            <th class="p-2 border">Estado</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr *ngFor="let r of report.rows">
+            <td class="p-2 border font-mono">
+            #{{ r.orderNumber }}
+            </td>
+
+            <td class="p-2 border">
+            {{ r.date | date:'short' }}
+            </td>
+
+            <td class="p-2 border">
+            {{ r.customerName }}
+            </td>
+
+            <td class="p-2 border">
+            {{ r.productsSummary }}
+            </td>
+
+            <td class="p-2 border text-center">
+            {{ r.totalItems }}
+            </td>
+
+            <td class="p-2 border">
+            S/ {{ r.total | number:'1.2-2' }}
+            </td>
+
+            <td class="p-2 border">
+            <span
+                class="font-semibold"
+                [class.text-green-600]="r.status === 'PAID'"
+                [class.text-blue-600]="r.status === 'COMPLETED'"
+            >
+                {{ r.status }}
+            </span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>

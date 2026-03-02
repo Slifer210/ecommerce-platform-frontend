@@ -1,0 +1,180 @@
+<app-header-base homeLink="/products">
+
+    <!-- BLOQUE CENTRAL -->
+    <div
+        center
+        class="flex items-center gap-3 w-full max-w-3xl"
+    >
+
+        <!-- CATEGORÍAS (SIEMPRE VISIBLES) -->
+        <div class="relative">
+
+        <button
+            type="button"
+            class="flex items-center gap-1
+                px-2 py-1.5
+                text-sm font-medium text-gray-800
+                rounded-md
+                hover:bg-gray-100/60
+                transition-colors duration-150
+                focus:outline-none"
+            (click)="toggleCategories()"
+        >
+            <span>Categorías</span>
+
+            <!-- Chevron -->
+            <svg
+            class="w-3.5 h-3.5 text-gray-500"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+            />
+            </svg>
+        </button>
+
+        <!-- OVERLAY -->
+        <div
+            *ngIf="showCategories"
+            class="fixed inset-0 bg-black/20 z-[9998]"
+            (click)="closeCategories()"
+        ></div>
+
+        <!-- MEGA MENU -->
+        <div
+            *ngIf="showCategories"
+            class="absolute left-0 top-full mt-3
+                bg-white border border-gray-200
+                rounded-xl shadow-xl
+                w-[900px] min-h-[360px]
+                z-[9999]"
+            (click)="$event.stopPropagation()"
+        >
+            <div class="grid grid-cols-4 gap-6 p-6">
+
+            <!-- CATEGORÍAS PADRE -->
+            <div class="col-span-1 border-r border-gray-200 pr-4">
+                <ul class="space-y-1">
+                <li
+                    *ngFor="let cat of categoryTree.get(null) ?? []"
+                    class="flex items-center justify-between
+                        px-3 py-2 rounded-lg cursor-pointer
+                        text-sm text-gray-800
+                        hover:bg-gray-100"
+                    (mouseenter)="activeCategory = cat"
+                    (click)="goToCategory(cat.id)"
+                >
+                    <span>{{ cat.name }}</span>
+                    <span class="text-gray-400">›</span>
+                </li>
+                </ul>
+            </div>
+
+            <!-- SUBCATEGORÍAS -->
+            <div class="col-span-3">
+
+                <ng-container *ngIf="activeCategory as parent">
+                <h4 class="text-sm font-semibold text-gray-900 mb-4">
+                    {{ parent.name }}
+                </h4>
+
+                <div class="grid grid-cols-3 gap-3">
+                    <a
+                    *ngFor="let child of categoryTree.get(parent.id) ?? []"
+                    [routerLink]="['/products']"
+                    [queryParams]="{ category: child.id }"
+                    (click)="closeCategories()"
+                    class="text-sm hover:underline"
+                    >
+                    {{ child.name }}
+                    </a>
+                </div>
+                </ng-container>
+
+                <div *ngIf="!activeCategory" class="text-sm text-gray-400">
+                Selecciona una categoría
+                </div>
+
+            </div>
+
+            </div>
+        </div>
+
+        </div>
+
+        <!-- BUSCADOR -->
+        <input
+        type="text"
+        placeholder="Buscar productos..."
+        class="flex-1
+                px-4 py-2
+                text-sm text-gray-900
+                bg-gray-100/70
+                rounded-lg
+                placeholder:text-gray-400
+                focus:bg-white
+                focus:ring-2 focus:ring-black/5
+                focus:outline-none
+                transition-all duration-150"
+        [value]="catalogState.searchDraft()"
+        (input)="catalogState.setDraft($any($event.target).value)"
+        (keydown.enter)="$event.preventDefault(); applySearch()"
+        />
+
+
+    </div>
+
+    <!-- ACTIONS -->
+    <ng-container actions>
+
+        <!-- NO AUTENTICADO -->
+        <ng-container *ngIf="!authState.isAuthenticated()">
+        <a
+            routerLink="/auth/login"
+            class="flex flex-col items-center text-gray-700 hover:text-black"
+        >
+            <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5.121 17.804A9 9 0 1118.364 4.636M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+            />
+            </svg>
+            <span>Ingresar</span>
+        </a>
+        </ng-container>
+
+        <!-- AUTENTICADO -->
+        <ng-container *ngIf="authState.isAuthenticated()">
+        <ng-container *ngIf="authState.user() as user">
+
+            <app-shop-header-customer-actions
+            *ngIf="!user.roles.includes('ADMIN')"
+            ></app-shop-header-customer-actions>
+
+            <app-shop-header-admin-actions
+            *ngIf="user.roles.includes('ADMIN')"
+            ></app-shop-header-admin-actions>
+
+        </ng-container>
+        </ng-container>
+
+    </ng-container>
+
+</app-header-base>
+
+<main class="min-h-screen bg-gray-50">
+    <router-outlet></router-outlet>
+</main>

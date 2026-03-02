@@ -1,0 +1,136 @@
+<h1 class="text-2xl font-bold mb-6">Clientes</h1>
+
+<!-- ========================= -->
+<!-- FILTROS -->
+<!-- ========================= -->
+<div class="flex flex-wrap gap-3 mb-4 items-center">
+
+  <!-- BUSCADOR -->
+  <input
+    type="text"
+    placeholder="Buscar por email o nombre…"
+    class="border px-3 py-2 rounded w-64"
+    [(ngModel)]="searchTerm"
+    (input)="applyFilters()"
+  />
+
+  <!-- ESTADO -->
+  <select
+    class="border px-3 py-2 rounded"
+    [(ngModel)]="statusFilter"
+    (change)="applyFilters()"
+  >
+    <option value="ALL">Todos</option>
+    <option value="ACTIVE">Activos</option>
+    <option value="INACTIVE">Inactivos</option>
+  </select>
+
+  <!-- EMAIL VERIFICADO -->
+  <select
+    class="border px-3 py-2 rounded"
+    [(ngModel)]="emailFilter"
+    (change)="applyFilters()"
+  >
+    <option value="ALL">Todos</option>
+    <option value="VERIFIED">Email verificado</option>
+    <option value="NOT_VERIFIED">No verificado</option>
+  </select>
+
+</div>
+
+<!-- ========================= -->
+<!-- LOADING -->
+<!-- ========================= -->
+<div *ngIf="loading" class="text-gray-500">
+  Cargando clientes…
+</div>
+
+<!-- ========================= -->
+<!-- TABLA -->
+<!-- ========================= -->
+<table
+  *ngIf="!loading && filteredCustomers.length > 0"
+  class="w-full border border-gray-300 text-sm bg-white rounded shadow"
+>
+  <thead class="bg-gray-100">
+    <tr>
+      <th class="p-2 border">Email</th>
+      <th class="p-2 border">Nombre</th>
+      <th class="p-2 border text-center">Estado</th>
+      <th class="p-2 border text-center">Email</th>
+      <th class="p-2 border text-center">Órdenes</th>
+      <th class="p-2 border">Registro</th>
+      <th class="p-2 border text-center">Acciones</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let c of filteredCustomers">
+
+      <td class="p-2 border font-medium">{{ c.email }}</td>
+
+      <td class="p-2 border">{{ c.fullName || '—' }}</td>
+
+      <td class="p-2 border text-center">
+        <span
+          class="px-2 py-0.5 rounded text-xs font-semibold"
+          [ngClass]="{
+            'bg-green-100 text-green-700': c.active,
+            'bg-red-100 text-red-700': !c.active
+          }"
+        >
+          {{ c.active ? 'Activo' : 'Inactivo' }}
+        </span>
+      </td>
+
+      <td class="p-2 border text-center">
+        <span
+          class="px-2 py-0.5 rounded text-xs font-semibold"
+          [ngClass]="{
+            'bg-blue-100 text-blue-700': c.emailVerified,
+            'bg-yellow-100 text-yellow-700': !c.emailVerified
+          }"
+        >
+          {{ c.emailVerified ? 'Verificado' : 'Pendiente' }}
+        </span>
+      </td>
+
+      <td class="p-2 border text-center font-semibold">
+        {{ c.totalOrders }}
+      </td>
+
+      <td class="p-2 border">
+        {{ c.createdAt | date:'short' }}
+      </td>
+
+      <td class="p-2 border text-center space-x-2">
+        <button
+          class="px-2 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700"
+          (click)="viewOrders(c.id)"
+        >
+          Ver órdenes
+        </button>
+
+        <button
+          class="px-2 py-1 rounded text-xs text-white"
+          [disabled]="loading"
+          [ngClass]="{
+            'bg-red-600 hover:bg-red-700': c.active,
+            'bg-green-600 hover:bg-green-700': !c.active
+          }"
+          (click)="toggleActive(c)"
+        >
+          {{ c.active ? 'Desactivar' : 'Activar' }}
+        </button>
+      </td>
+
+    </tr>
+  </tbody>
+</table>
+
+<!-- ========================= -->
+<!-- EMPTY -->
+<!-- ========================= -->
+<div *ngIf="!loading && filteredCustomers.length === 0" class="text-gray-500">
+  No hay clientes que coincidan con los filtros.
+</div>

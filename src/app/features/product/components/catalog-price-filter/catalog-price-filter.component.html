@@ -1,0 +1,77 @@
+<div class="space-y-4">
+
+  <!-- HEADER -->
+  <div class="flex items-center justify-between">
+    <h2 class="text-sm font-semibold text-gray-900">
+      Precio
+    </h2>
+
+    <!-- LIMPIAR -->
+    <button
+      *ngIf="minPrice !== null || maxPrice !== null"
+      class="text-xs text-gray-500 hover:underline"
+      (click)="clearPrice()"
+    >
+      Limpiar
+    </button>
+  </div>
+
+  <!-- INPUTS MANUALES -->
+  <div class="space-y-2">
+
+    <input
+      type="number"
+      class="w-full rounded-md border border-gray-300
+             px-3 py-2 text-sm
+             focus:border-black focus:ring-1 focus:ring-black"
+      placeholder="Precio mínimo"
+      [value]="minPrice ?? ''"
+      (input)="onMinChange($any($event.target).valueAsNumber || null)"
+    />
+
+    <input
+      type="number"
+      class="w-full rounded-md border border-gray-300
+             px-3 py-2 text-sm
+             focus:border-black focus:ring-1 focus:ring-black"
+      placeholder="Precio máximo"
+      [value]="maxPrice ?? ''"
+      (input)="onMaxChange($any($event.target).valueAsNumber || null)"
+    />
+
+  </div>
+
+  <!-- DIVISOR -->
+  <div class="border-t border-gray-200"></div>
+
+  <!-- RANGOS -->
+  <ul
+    *ngIf="priceRanges.length > 0"
+    class="space-y-1 text-sm"
+  >
+    <li
+      *ngFor="let r of priceRanges"
+      class="flex justify-between items-center
+             rounded-md px-2 py-1
+             cursor-pointer
+             transition-colors"
+      [class.bg-gray-100]="isRangeActive(r.from, r.to)"
+      [class.font-medium]="isRangeActive(r.from, r.to)"
+      (click)="onSelectRange(r.from, r.to)"
+    >
+      <span>
+        <ng-container *ngIf="r.to !== null; else plus">
+          S/ {{ r.from }} – S/ {{ r.to }}
+        </ng-container>
+        <ng-template #plus>
+          S/ {{ r.from }} +
+        </ng-template>
+      </span>
+
+      <span class="text-xs text-gray-500">
+        {{ r.count }}
+      </span>
+    </li>
+  </ul>
+
+</div>

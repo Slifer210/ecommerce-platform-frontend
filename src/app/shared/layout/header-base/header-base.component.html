@@ -1,0 +1,20 @@
+<header class="bg-white border-b shadow-sm">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+
+        <!-- LOGO -->
+        <a [routerLink]="homeLink" class="text-xl font-bold">
+        E-Shop
+        </a>
+
+        <!-- SLOT CENTRAL -->
+        <div class="flex-1 flex justify-center px-6">
+        <ng-content select="[center]"></ng-content>
+        </div>
+
+        <!-- SLOT ACCIONES -->
+        <div class="flex items-center gap-6 text-sm">
+        <ng-content select="[actions]"></ng-content>
+        </div>
+
+    </div>
+</header>

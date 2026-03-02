@@ -1,0 +1,171 @@
+<h1 class="text-2xl font-bold mb-2">Categorías</h1>
+
+<p class="text-sm text-gray-600 mb-6">
+    Organiza tu catálogo usando categorías principales y subcategorías.
+</p>
+
+<!-- ========================= -->
+<!-- FORMULARIO -->
+<!-- ========================= -->
+<div class="bg-white border rounded p-4 mb-6">
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+
+        <!-- NOMBRE -->
+        <div>
+        <label class="block text-sm font-medium mb-1">
+            Nombre de la categoría
+        </label>
+        <input
+            class="border p-2 rounded w-full"
+            placeholder="Ej: Laptops"
+            [(ngModel)]="name"
+        />
+        </div>
+
+        <!-- CATEGORÍA PADRE -->
+        <div>
+        <label class="block text-sm font-medium mb-1">
+            Categoría padre
+        </label>
+        <select
+            class="border p-2 rounded w-full"
+            [(ngModel)]="parentId"
+        >
+            <option [ngValue]="null">
+            📂 Categoría principal
+            </option>
+
+            <option
+            *ngFor="let c of parentCategories"
+            [ngValue]="c.id"
+            [disabled]="editing?.id === c.id"
+            >
+            ↳ Subcategoría de {{ c.name }}
+            </option>
+        </select>
+        </div>
+
+        <!-- BOTONES -->
+        <div class="flex gap-2">
+        <button
+            class="px-4 py-2 bg-blue-600 text-white rounded"
+            (click)="save()"
+        >
+            {{ editing ? 'Actualizar' : 'Crear' }}
+        </button>
+
+        <button
+            *ngIf="editing"
+            class="px-4 py-2 bg-gray-500 text-white rounded"
+            (click)="resetForm()"
+        >
+            Cancelar
+        </button>
+        </div>
+
+    </div>
+
+    <!-- FEEDBACK VISUAL -->
+    <div class="mt-3 text-sm">
+        <span *ngIf="!parentId" class="text-green-600">
+        📁 Se creará una <strong>categoría principal</strong>
+        </span>
+
+        <span *ngIf="parentId" class="text-blue-600">
+        ➕ Se creará una <strong>subcategoría</strong> dentro de
+        <strong>
+            {{ parentCategoryName }}
+        </strong>
+        </span>
+    </div>
+
+</div>
+
+<!-- ========================= -->
+<!-- TABLA DE CATEGORÍAS -->
+<!-- ========================= -->
+<table class="w-full border text-sm bg-white rounded overflow-hidden">
+
+    <thead class="bg-gray-100">
+        <tr>
+        <th class="p-2 border text-left">Categoría</th>
+        <th class="p-2 border text-left">Tipo</th>
+        <th class="p-2 border text-left">Pertenece a</th>
+        <th class="p-2 border text-center">Acciones</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        <!-- CATEGORÍAS PRINCIPALES -->
+        <ng-container *ngFor="let parent of parentCategories">
+
+        <tr class="bg-gray-50">
+            <td class="p-2 border font-semibold">
+            📁 {{ parent.name }}
+            </td>
+
+            <td class="p-2 border">
+            Categoría principal
+            </td>
+
+            <td class="p-2 border text-gray-400">
+            —
+            </td>
+
+            <td class="p-2 border text-center space-x-2">
+            <button
+                class="px-2 py-1 bg-yellow-500 text-white rounded"
+                (click)="edit(parent)"
+            >
+                Editar
+            </button>
+
+            <button
+                class="px-2 py-1 bg-red-600 text-white rounded"
+                (click)="delete(parent.id)"
+            >
+                Eliminar
+            </button>
+            </td>
+        </tr>
+
+        <!-- SUBCATEGORÍAS -->
+        <tr
+            *ngFor="let child of getChildren(parent.id)"
+            class="bg-white"
+        >
+            <td class="p-2 border pl-10">
+            ↳ {{ child.name }}
+            </td>
+
+            <td class="p-2 border text-blue-600">
+            Subcategoría
+            </td>
+
+            <td class="p-2 border">
+            {{ parent.name }}
+            </td>
+
+            <td class="p-2 border text-center space-x-2">
+            <button
+                class="px-2 py-1 bg-yellow-500 text-white rounded"
+                (click)="edit(child)"
+            >
+                Editar
+            </button>
+
+            <button
+                class="px-2 py-1 bg-red-600 text-white rounded"
+                (click)="delete(child.id)"
+            >
+                Eliminar
+            </button>
+            </td>
+        </tr>
+
+        </ng-container>
+
+    </tbody>
+</table>

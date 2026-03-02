@@ -1,0 +1,139 @@
+<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+
+    <div class="bg-white w-full max-w-2xl rounded shadow-lg p-6">
+
+        <h2 class="text-xl font-bold mb-4">
+        {{ product ? 'Editar Producto' : 'Nuevo Producto' }}
+        </h2>
+
+        <div class="space-y-3">
+
+        <input
+            [(ngModel)]="form.name"
+            placeholder="Nombre"
+            class="w-full border p-2 rounded"
+        />
+
+        <input
+            [(ngModel)]="form.description"
+            placeholder="Descripción"
+            class="w-full border p-2 rounded"
+        />
+
+        <div class="flex gap-3">
+            <input
+            type="number"
+            [(ngModel)]="form.price"
+            placeholder="Precio"
+            class="w-full border p-2 rounded"
+            />
+
+            <input
+            type="number"
+            [(ngModel)]="form.stock"
+            placeholder="Stock"
+            class="w-full border p-2 rounded"
+            />
+        </div>
+
+        </div>
+
+        <app-admin-product-images
+        *ngIf="product?.id"
+        [productId]="product!.id"
+        class="mt-4"
+        ></app-admin-product-images>
+
+        <div class="mt-6">
+
+        <h3 class="font-semibold mb-2">Características principales</h3>
+
+        <div
+            *ngFor="let a of principales; let i = index"
+            class="flex gap-2 mb-2"
+        >
+            <input
+            class="border p-2 rounded w-1/2"
+            [(ngModel)]="a.name"
+            placeholder="Nombre"
+            />
+
+            <input
+            class="border p-2 rounded w-1/2"
+            [(ngModel)]="a.value"
+            placeholder="Valor"
+            />
+
+            <button
+            class="px-2 text-red-600"
+            (click)="removePrincipal(i)"
+            >
+            X
+            </button>
+        </div>
+
+        <button
+            class="text-sm text-blue-600"
+            (click)="addPrincipal()"
+        >
+            Agregar característica principal
+        </button>
+
+        </div>
+
+        <div class="mt-6">
+
+        <h3 class="font-semibold mb-2">Otros</h3>
+
+        <div
+            *ngFor="let a of otros; let i = index"
+            class="flex gap-2 mb-2"
+        >
+            <input
+            class="border p-2 rounded w-1/2"
+            [(ngModel)]="a.name"
+            placeholder="Nombre"
+            />
+
+            <input
+            class="border p-2 rounded w-1/2"
+            [(ngModel)]="a.value"
+            placeholder="Valor"
+            />
+
+            <button
+            class="px-2 text-red-600"
+            (click)="removeOtro(i)"
+            >
+            X
+            </button>
+        </div>
+
+        <button
+            class="text-sm text-blue-600"
+            (click)="addOtro()"
+        >
+            Agregar otro atributo
+        </button>
+
+        </div>
+
+        <div class="flex justify-end gap-2 mt-6">
+
+        <button
+            class="px-3 py-1 bg-gray-300 rounded"
+            (click)="close.emit()"
+        >
+            Cancelar
+        </button>
+
+        <button
+            class="px-3 py-1 bg-blue-600 text-white rounded"
+            (click)="submit()"
+        >
+            Guardar
+        </button>
+
+        </div>
+    </div>
+</div>

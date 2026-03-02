@@ -1,0 +1,121 @@
+<div *ngIf="loading" class="p-6 text-center">
+    Cargando perfil...
+</div>
+
+<form
+    *ngIf="!loading"
+    [formGroup]="form"
+    (ngSubmit)="submit()"
+    class="bg-white p-6 rounded shadow space-y-6 max-w-xl mx-auto"
+>
+
+    <!-- AVATAR -->
+    <div class="flex items-center gap-6">
+        <div class="relative">
+            <img
+                [src]="profileImageUrl || '/assets/avatar-placeholder.png'"
+                class="w-24 h-24 rounded-full object-cover border"
+            />
+
+            <label
+                class="absolute bottom-0 right-0 bg-black text-white text-xs px-2 py-1 rounded cursor-pointer"
+            >
+                Cambiar
+                <input
+                    type="file"
+                    accept="image/*"
+                    hidden
+                    (change)="uploadPhoto($event)"
+                />
+            </label>
+        </div>
+
+        <div class="text-sm text-gray-600">
+            <p>Foto de perfil</p>
+            <p class="text-xs">
+                Puedes cambiarla cuando quieras.
+            </p>
+        </div>
+    </div>
+
+    <!-- PROGRESO PERFIL -->
+    <div class="space-y-1">
+    <div class="flex justify-between text-xs text-gray-600">
+        <span>{{ progressLabel }}</span>
+        <span>{{ profileProgress }}%</span>
+    </div>
+
+    <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+        <div
+        class="h-full transition-all duration-300"
+        [ngClass]="progressColor"
+        [style.width.%]="profileProgress"
+        ></div>
+    </div>
+    </div>
+
+
+    <!-- NOMBRE -->
+    <div>
+        <label class="block text-sm font-medium">Nombre completo</label>
+        <input
+            type="text"
+            formControlName="fullName"
+            class="border rounded w-full px-3 py-2"
+        />
+    </div>
+
+    <!-- TIPO DOCUMENTO -->
+    <div>
+        <label class="block text-sm font-medium">Tipo de documento</label>
+        <select
+            formControlName="identityDocumentTypeId"
+            class="border rounded w-full px-3 py-2"
+        >
+            <option [ngValue]="null">Seleccionar</option>
+            <option *ngFor="let t of documentTypes" [ngValue]="t.id">
+                {{ t.name }}
+            </option>
+        </select>
+    </div>
+
+    <!-- NUMERO DOCUMENTO -->
+    <div>
+        <label class="block text-sm font-medium">Número de documento</label>
+        <input
+            type="text"
+            formControlName="identityDocumentNumber"
+            class="border rounded w-full px-3 py-2"
+        />
+    </div>
+
+    <!-- TELEFONO -->
+    <div>
+        <label class="block text-sm font-medium">Teléfono</label>
+        <input
+            type="text"
+            formControlName="phone"
+            class="border rounded w-full px-3 py-2"
+        />
+    </div>
+
+    <!-- ACCIONES -->
+    <div class="flex gap-3 justify-end pt-4">
+        <button
+            *ngIf="mode === 'modal'"
+            type="button"
+            (click)="cancel()"
+            class="px-4 py-2 border rounded"
+        >
+            Cancelar
+        </button>
+
+        <button
+            type="submit"
+            [disabled]="saving"
+            class="px-4 py-2 bg-black text-white rounded"
+        >
+            Guardar
+        </button>
+    </div>
+</form>

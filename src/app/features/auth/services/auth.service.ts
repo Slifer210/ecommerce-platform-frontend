@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
+import { environment } from '../../../../environments/environment';
+
 import {
     LoginRequest,
     LoginResponse,
@@ -14,7 +16,7 @@ import {
 })
 export class AuthService {
 
-    private readonly BASE_URL = '/api/auth';
+    private readonly BASE_URL = `${environment.apiBase}/auth`;
     private readonly TOKEN_KEY = 'token';
 
     constructor(private http: HttpClient) {}
@@ -56,27 +58,21 @@ export class AuthService {
 
     requestPasswordReset(email: string) {
         return this.http.post(
-            '/api/auth/password-reset/request',
-            { email }
+        `${environment.apiBase}/auth/password-reset/request`,
+        { email }
         );
     }
 
     confirmPasswordReset(token: string, newPassword: string) {
         return this.http.post(
-            '/api/auth/password-reset/confirm',
-            {
-            token,
-            newPassword
-            }
+        `${environment.apiBase}/auth/password-reset/confirm`,
+        { token, newPassword }
         );
     }
 
-
     loginWithGoogle(): void {
-        window.location.href =
-        'http://localhost:8080/oauth2/authorization/google';
+        window.location.href = environment.googleAuthUrl;
     }
-
 
     saveToken(token: string): void {
         localStorage.setItem(this.TOKEN_KEY, token);

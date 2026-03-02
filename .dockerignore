@@ -1,0 +1,31 @@
+
+# NODE / ANGULAR
+node_modules
+dist
+.angular
+.cache
+
+# GIT
+.git
+.gitignore
+
+# IDE / EDITORES
+.vscode
+.idea
+*.swp
+
+# LOGS
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+*.log
+
+# SISTEMA OPERATIVO
+.DS_Store
+Thumbs.db
+
+# DOCUMENTACION
+README.md
+
+# DOCKER (opcional)
+docker-compose.yml

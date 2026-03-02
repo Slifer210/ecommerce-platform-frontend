@@ -1,61 +1,61 @@
-# ===============================
-# COMPILED OUTPUT
-# ===============================
+# ======================================
+# ANGULAR / BUILD OUTPUT
+# ======================================
 /dist
-/tmp
-/out-tsc
-/bazel-out
-
-# ===============================
-# NODE
-# ===============================
-/node_modules
-npm-debug.log
-yarn-error.log
-*.log
-
-# ===============================
-# ANGULAR
-# ===============================
 /.angular
+/out-tsc
+/tmp
 /coverage
 
-# ===============================
-# IDEs / EDITORES
-# ===============================
-.idea/
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
+# ======================================
+# NODE
+# ======================================
+/node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
 
-# Visual Studio Code
+# ======================================
+# TESTING
+# ======================================
+/coverage
+/test-results
+
+# ======================================
+# CACHE
+# ======================================
+.sass-cache/
+.eslintcache
+.cache/
+
+# ======================================
+# IDEs / EDITORS
+# ======================================
+.idea/
 .vscode/*
 !.vscode/settings.json
+!.vscode/extensions.json
 !.vscode/tasks.json
 !.vscode/launch.json
-!.vscode/extensions.json
-.history/*
+.history/
 
-# ===============================
-# DOCKER
-# ===============================
-.dockerignore
-docker-compose.yml
+# ======================================
+# OS FILES
+# ======================================
+.DS_Store
+Thumbs.db
 
-# ===============================
-# MISC
-# ===============================
-.sass-cache/
+# ======================================
+# ANGULAR MISC
+# ======================================
+/typings
 /connect.lock
 /libpeerconnection.log
 testem.log
-/typings
 
-# ===============================
-# SYSTEM FILES
-# ===============================
-.DS_Store
-Thumbs.db
+# ======================================
+# ENV FILES (si algún día usas)
+# ======================================
+.env*

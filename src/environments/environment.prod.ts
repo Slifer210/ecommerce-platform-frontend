@@ -1,13 +1,10 @@
 export const environment = {
     production: true,
 
-    // BACKEND PRODUCCIÓN (Render)
     apiUrl: 'https://ecommerce-platform-backend-2cwb.onrender.com',
+    apiBase:
+        'https://ecommerce-platform-backend-2cwb.onrender.com/api',
 
-    // API base
-    apiBase: '/api',
-
-    // OAuth Google producción
     googleAuthUrl:
         'https://ecommerce-platform-backend-2cwb.onrender.com/oauth2/authorization/google',
 

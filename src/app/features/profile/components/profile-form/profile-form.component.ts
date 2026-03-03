@@ -67,13 +67,19 @@ export class ProfileFormComponent implements OnInit {
       profile: this.profileApi.getProfile()
     }).subscribe({
       next: ({ types, profile }) => {
-        this.documentTypes = types;
-        this.patchProfile(profile);
+        this.documentTypes = types ?? [];
+        if (profile) {
+          this.patchProfile(profile);
+        }
         this.loading = false;
       },
-      error: () => {
+      error: (error) => {
         this.loading = false;
-        Swal.fire('Error', 'No se pudo cargar el perfil', 'error');
+        if (error.status === 401) return;
+        if (error.status >= 500) {
+          Swal.fire('Error', 'Ocurrió un error del servidor', 'error');
+        }
+
       }
     });
   }

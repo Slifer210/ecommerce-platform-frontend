@@ -71,31 +71,40 @@ export class AdminProductsComponent implements OnInit {
 
     this.adminProductService.getAll().subscribe({
       next: products => {
-        this.products = products;
+
+        // Evita null
+        this.products = products ?? [];
 
         this.categoryService.getAll().subscribe({
           next: categories => {
-            this.categories = categories;
+            this.categories = categories ?? [];
             this.applyFilters();
             this.loading = false;
           },
           error: error => {
             this.loading = false;
 
-            // 🔕 401 → lo maneja el interceptor
             if (error.status === 401) return;
 
-            this.alert.error('No se pudieron cargar las categorías');
+            if (error.status >= 500) {
+              this.alert.error('Ocurrió un error del servidor');
+              return;
+            }
+            this.categories = [];
+            this.applyFilters();
           }
         });
       },
       error: error => {
         this.loading = false;
 
-        // 🔕 401 → lo maneja el interceptor
         if (error.status === 401) return;
 
-        this.alert.error('No se pudo cargar la lista de productos');
+        if (error.status >= 500) {
+          this.alert.error('Ocurrió un error del servidor');
+          return;
+        }
+        this.products = [];
       }
     });
   }

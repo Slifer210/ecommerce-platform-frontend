@@ -261,16 +261,21 @@ export class AdminOrdersComponent implements OnInit {
 
   viewHistory(orderId: string): void {
     this.adminOrderService.getHistory(orderId).subscribe({
-      next: history => {
-        this.history = history;
+      next: (history) => {
+        this.history = history ?? [];
         this.showHistoryModal = true;
       },
-      error: () => {
-        this.alert.error('No se pudo cargar el historial de la orden');
+      error: (error) => {
+        if (error.status === 401) return;
+        if (error.status >= 500) {
+          this.alert.error('Ocurrió un error del servidor');
+          return;
+        }
+        this.history = [];
+        this.showHistoryModal = true;
       }
     });
   }
-
   closeHistory(): void {
     this.showHistoryModal = false;
     this.history = [];

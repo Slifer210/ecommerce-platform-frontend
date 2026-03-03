@@ -31,8 +31,25 @@ export class AdminCategoriesComponent implements OnInit {
 
   load(): void {
     this.categoryService.getAll().subscribe({
-      next: c => this.categories = c,
-      error: () => this.alert.error('No se pudieron cargar las categorías')
+      next: (c) => {
+        this.categories = c ?? [];
+      },
+      error: (error) => {
+        if (error.status === 401) return;
+        if (
+          error.status === 200 &&
+          typeof error.error === 'string' &&
+          error.error.includes('<!doctype html>')
+        ) {
+          this.categories = [];
+          return;
+        }
+        if (error.status >= 500) {
+          this.alert.error('Ocurrió un error del servidor');
+          return;
+        }
+        this.categories = [];
+      }
     });
   }
 

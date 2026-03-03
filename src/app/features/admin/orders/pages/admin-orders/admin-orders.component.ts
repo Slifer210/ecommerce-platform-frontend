@@ -70,18 +70,31 @@ export class AdminOrdersComponent implements OnInit {
     this.loading = true;
 
     this.adminOrderService.getAll(this.customerId ?? undefined).subscribe({
-      next: orders => {
-        this.orders = orders;
+      next: (orders) => {
+        this.orders = orders ?? [];
         this.applyFilters();
         this.loading = false;
       },
-      error: () => {
+      error: (error) => {
         this.loading = false;
-        this.alert.error('No se pudo cargar la lista de órdenes');
+
+        if (error.status === 401) return;
+        if (
+          error.status === 200 &&
+          typeof error.error === 'string' &&
+          error.error.includes('<!doctype html>')
+        ) {
+          this.orders = [];
+          return;
+        }
+        if (error.status >= 500) {
+          this.alert.error('Ocurrió un error del servidor');
+          return;
+        }
+        this.orders = [];
       }
     });
   }
-
   // =========================
   // FILTROS FRONT (ID + ESTADO)
   // =========================

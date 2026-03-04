@@ -3,9 +3,10 @@
     (click)="closeModal()"
 >
     <div
-        class="bg-white w-96 rounded p-6"
+        class="bg-white w-96 rounded p-6 shadow-lg"
         (click)="$event.stopPropagation()"
     >
+
         <h2 class="text-lg font-bold mb-4">
         Categorías del producto
         </h2>
@@ -16,7 +17,11 @@
         </div>
 
         <!-- LISTA -->
-        <div *ngIf="!loading" class="space-y-4 max-h-72 overflow-auto">
+        <div
+        *ngIf="!loading"
+        #scrollContainer
+        class="space-y-4 max-h-72 overflow-auto transition-all"
+        >
 
         <!-- CATEGORÍAS PRINCIPALES -->
         <div *ngFor="let parent of parentCategories">
@@ -30,13 +35,14 @@
 
             <label
                 *ngFor="let child of getChildren(parent.id)"
-                class="flex items-center gap-2 cursor-pointer text-sm"
+                class="flex items-center gap-2 cursor-pointer text-sm hover:bg-gray-100 p-1 rounded"
             >
                 <input
                 type="checkbox"
                 [checked]="selected.has(child.id)"
                 (change)="toggle(child.id, $any($event.target).checked)"
                 />
+
                 {{ child.name }}
             </label>
 
@@ -60,7 +66,7 @@
         <!-- BOTONES -->
         <div class="flex justify-end mt-4">
         <button
-            class="px-3 py-1 bg-gray-300 rounded"
+            class="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400"
             (click)="closeModal()"
         >
             Cerrar

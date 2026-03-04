@@ -82,6 +82,16 @@ export const ADMIN_ROUTES: Routes = [
                     .then(m => m.AdminQaInboxComponent)
         },
 
+        /* ============================
+        * IMPORT PRODUCTS
+        * ============================ */
+        {
+            path: 'products/import',
+            loadComponent: () =>
+                import('./products/pages/admin-product-import/admin-product-import.component')
+                .then(m => m.AdminProductImportComponent)
+        },
+
 
         /* ============================
         * REPORTS

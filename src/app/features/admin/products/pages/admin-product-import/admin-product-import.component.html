@@ -1,0 +1,177 @@
+<div class="max-w-5xl mx-auto space-y-8">
+
+    <!-- CARD IMPORTAR -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-8">
+
+        <h2 class="text-2xl font-semibold text-gray-800 mb-6">
+        Importar productos
+        </h2>
+
+        <div class="flex items-center gap-4">
+
+        <input
+            type="file"
+            accept=".csv,.xlsx"
+            (change)="onFileSelected($event)"
+            class="block w-full text-sm text-gray-600
+                file:mr-4 file:py-2 file:px-4
+                file:rounded-lg file:border-0
+                file:text-sm file:font-medium
+                file:bg-indigo-50 file:text-indigo-700
+                hover:file:bg-indigo-100"
+        />
+
+        <button
+            (click)="importProducts()"
+            [disabled]="loading"
+            class="px-5 py-2.5 bg-indigo-600 text-white rounded-lg
+                hover:bg-indigo-700 transition
+                disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+            Importar
+        </button>
+
+        </div>
+
+        <div *ngIf="loading" class="mt-6 text-sm text-gray-500">
+        Importando productos...
+        </div>
+
+        <!-- RESULTADO -->
+        <div *ngIf="result" class="mt-8 pt-6 border-t border-gray-200">
+
+        <div class="flex flex-wrap gap-6 text-sm">
+
+            <div>
+            <span class="text-gray-500">Batch ID</span>
+            <p class="font-medium text-indigo-600">
+                {{ result.batchId }}
+            </p>
+            </div>
+
+            <div>
+            <span class="text-gray-500">Importados</span>
+            <p class="font-semibold text-green-600">
+                {{ result.imported }}
+            </p>
+            </div>
+
+            <div>
+            <span class="text-gray-500">Fallidos</span>
+            <p class="font-semibold text-red-600">
+                {{ result.failed }}
+            </p>
+            </div>
+
+        </div>
+
+        <button
+            (click)="rollbackImport()"
+            class="mt-5 px-4 py-2 bg-red-600 text-white rounded-lg
+                hover:bg-red-700 transition"
+        >
+            Revertir import
+        </button>
+
+        <!-- ERRORES -->
+        <div *ngIf="result.errors.length > 0" class="mt-6">
+
+            <p class="font-medium text-red-600 mb-2">
+            Errores detectados
+            </p>
+
+            <ul class="text-sm text-red-500 space-y-1">
+            <li *ngFor="let e of result.errors">
+                • {{ e }}
+            </li>
+            </ul>
+
+        </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- HISTORIAL -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-8">
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-6">
+        Historial de importaciones
+        </h3>
+
+        <div class="overflow-x-auto">
+
+        <table *ngIf="imports.length > 0" class="w-full text-sm">
+
+            <thead class="text-gray-500 border-b border-gray-200">
+
+            <tr>
+
+                <th class="py-3 text-left font-medium">Batch</th>
+                <th class="py-3 text-left font-medium">Archivo</th>
+                <th class="py-3 text-left font-medium">Total</th>
+                <th class="py-3 text-left font-medium">Importados</th>
+                <th class="py-3 text-left font-medium">Fallidos</th>
+                <th class="py-3 text-left font-medium">Fecha</th>
+                <th class="py-3"></th>
+
+            </tr>
+
+            </thead>
+
+            <tbody class="divide-y divide-gray-100">
+
+            <tr *ngFor="let b of imports" class="hover:bg-gray-50 transition">
+
+                <td class="py-3 font-mono text-gray-700">
+                {{ b.id }}
+                </td>
+
+                <td class="py-3 text-gray-600">
+                {{ b.fileName }}
+                </td>
+
+                <td class="py-3">
+                {{ b.totalProducts }}
+                </td>
+
+                <td class="py-3 font-medium text-green-600">
+                {{ b.importedProducts }}
+                </td>
+
+                <td class="py-3 font-medium text-red-600">
+                {{ b.failedProducts }}
+                </td>
+
+                <td class="py-3 text-gray-500">
+                {{ b.createdAt | date:'short' }}
+                </td>
+
+                <td class="py-3 text-right">
+
+                <button
+                    (click)="deleteBatch(b.id)"
+                    class="px-3 py-1.5 text-sm bg-red-500 text-white rounded-lg
+                        hover:bg-red-600 transition"
+                >
+                    Delete
+                </button>
+
+                </td>
+
+            </tr>
+
+            </tbody>
+
+        </table>
+
+        </div>
+
+        <p *ngIf="imports.length === 0" class="text-gray-500 text-sm">
+        No imports yet
+        </p>
+
+    </div>
+
+</div>

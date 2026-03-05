@@ -16,7 +16,7 @@ import {
 })
 export class AuthService {
 
-    private readonly BASE_URL = `${environment.apiBase}/auth`;
+    private readonly BASE_URL = '/api/auth';
     private readonly TOKEN_KEY = 'token';
 
     constructor(private http: HttpClient) {}
@@ -58,15 +58,15 @@ export class AuthService {
 
     requestPasswordReset(email: string) {
         return this.http.post(
-        `${environment.apiBase}/auth/password-reset/request`,
-        { email }
+            `/api/auth/password-reset/request`,
+            { email }
         );
     }
 
     confirmPasswordReset(token: string, newPassword: string) {
         return this.http.post(
-        `${environment.apiBase}/auth/password-reset/confirm`,
-        { token, newPassword }
+            `/api/auth/password-reset/confirm`,
+            { token, newPassword }
         );
     }
 

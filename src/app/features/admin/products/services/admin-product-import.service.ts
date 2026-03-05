@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ProductImportResult } from '../models/product-import-result.model';
 import { ProductImportBatch } from '../models/product-import-batch.model';
-import { environment } from '../../../../../environments/environment';
 
 
 @Injectable({
@@ -11,7 +10,7 @@ import { environment } from '../../../../../environments/environment';
 })
 export class AdminProductImportService {
 
-    private api = `${environment.apiBase}/admin/products`;
+    private api = '/api/admin/products';
 
     constructor(private http: HttpClient) {}
 

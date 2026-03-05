@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ProductImportResult } from '../models/product-import-result.model';
 import { ProductImportBatch } from '../models/product-import-batch.model';
+import { environment } from '../../../../../environments/environment';
 
 
 @Injectable({
@@ -10,7 +11,7 @@ import { ProductImportBatch } from '../models/product-import-batch.model';
 })
 export class AdminProductImportService {
 
-    private api = '/api/admin/products';
+    private api = `${environment.apiBase}/admin/products`;
 
     constructor(private http: HttpClient) {}
 
@@ -34,9 +35,11 @@ export class AdminProductImportService {
     }
 
     getImportHistory(): Observable<ProductImportBatch[]> {
+
         return this.http.get<ProductImportBatch[]>(
-            `${this.api}/import`
+        `${this.api}/import`
         );
+
     }
 
 }

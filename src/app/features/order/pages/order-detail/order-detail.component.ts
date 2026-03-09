@@ -28,7 +28,7 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
   readonly loading = signal<boolean>(false);
 
   private orderId: string | null = null;
-  private pollingId: any = null;
+  private pollingId: ReturnType<typeof setInterval> | null = null;
 
   /* =========================
     FLOW FIJO
@@ -106,8 +106,11 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
 
   private startPolling(): void {
 
+    this.clearPolling();
+
     const MAX_ATTEMPTS = 12;
     let attempts = 0;
+    let verifying = false;
 
     this.pollingId = setInterval(() => {
 
@@ -117,28 +120,40 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
       }
 
       const currentOrder = this.order();
+
       if (!currentOrder || currentOrder.status !== 'PROCESSING') {
         this.clearPolling();
         return;
       }
+
       if (attempts >= MAX_ATTEMPTS) {
         console.log('Polling detenido: tiempo máximo alcanzado');
         this.clearPolling();
         return;
       }
 
+      if (verifying) {
+        return;
+      }
+
+      verifying = true;
       attempts++;
 
       this.orderService.verifyPayment(this.orderId).subscribe({
-        complete: () => {
+        next: () => {
+
           this.loadAll(false);
         },
         error: () => {
           console.warn('Error verificando pago');
+        },
+        complete: () => {
+          verifying = false;
         }
       });
 
     }, 5000);
+
   }
 
   private clearPolling(): void {

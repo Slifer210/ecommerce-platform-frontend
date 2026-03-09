@@ -48,26 +48,26 @@
         </div>
         </div>
 
-        <!-- CONFIRMANDO PAGO -->
+        <!-- PAGO PENDIENTE -->
         <div
         *ngIf="o.status === 'PROCESSING'"
-        class="bg-blue-50 border border-blue-200 rounded p-4 mt-4 flex gap-4 items-start">
+        class="bg-yellow-50 border border-yellow-200 rounded p-4 mt-4">
 
-        <!-- Spinner -->
-        <span
-            class="mt-1 inline-block w-6 h-6 border-2 border-blue-300 border-t-blue-600 rounded-full animate-spin">
-        </span>
+            <p class="font-medium text-yellow-900">
+            Pago pendiente
+            </p>
 
-        <!-- Texto -->
-        <div>
-            <p class="font-medium text-blue-900">
-            Estamos confirmando tu pago
+            <p class="text-sm text-yellow-800 mt-1">
+            Aún no se ha completado el pago de esta orden.
+            Puedes continuar el proceso de pago.
             </p>
-            <p class="text-sm text-blue-800 mt-1">
-            Este proceso puede tardar unos segundos.  
-            No cierres esta página ni intentes pagar nuevamente.
-            </p>
-        </div>
+
+            <button
+            class="mt-3 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+            (click)="continuePayment()">
+            Continuar pago
+            </button>
+
         </div>
 
         <!-- COMPROBANTE (SOLO CUANDO ESTÁ PAGADO) -->

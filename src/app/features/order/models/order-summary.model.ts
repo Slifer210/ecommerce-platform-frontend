@@ -4,6 +4,7 @@ export interface OrderSummary {
     total: number;
     createdAt: string; 
     itemsCount: number;
+    paymentInitPoint?: string;
 }
 
 export type OrderStatus =

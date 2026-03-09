@@ -47,14 +47,30 @@ export class MyOrdersComponent implements OnInit {
     this.router.navigate(['/my-orders', orderId]);
   }
 
+  continuePayment(url: string): void {
+    if (!url) return;
+    window.location.href = url;
+  }
+
   statusLabel(status: OrderStatus): string {
     switch (status) {
-      case 'PAID': return 'Pagado';
-      case 'PROCESSING': return 'En proceso';
-      case 'SHIPPED': return 'Enviado';
-      case 'COMPLETED': return 'Completado';
-      case 'CANCELLED': return 'Cancelado';
-      default: return status;
+      case 'PAID':
+        return 'Pagado';
+
+      case 'PROCESSING':
+        return 'Pago pendiente';
+
+      case 'SHIPPED':
+        return 'Enviado';
+
+      case 'COMPLETED':
+        return 'Completado';
+
+      case 'CANCELLED':
+        return 'Cancelado';
+
+      default:
+        return status;
     }
   }
 }

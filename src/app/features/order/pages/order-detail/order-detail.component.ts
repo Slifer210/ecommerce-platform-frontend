@@ -20,7 +20,7 @@ import { ReviewFormComponent } from "../../../product-review/components/review-f
 export class OrderDetailComponent implements OnInit, OnDestroy {
 
   /* =========================
-     STATE
+    STATE
   ========================== */
 
   readonly order = signal<OrderDetail | null>(null);
@@ -31,7 +31,7 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
   private pollingId: any = null;
 
   /* =========================
-     FLOW FIJO
+    FLOW FIJO
   ========================== */
 
   readonly orderFlow: OrderStatus[] = [
@@ -43,7 +43,7 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
   ];
 
   /* =========================
-     COMPUTEDS
+    COMPUTEDS
   ========================== */
 
   readonly totalItems = computed(() =>
@@ -61,7 +61,7 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
   ) {}
 
   /* =========================
-     INIT
+    INIT
   ========================== */
 
   ngOnInit(): void {
@@ -101,29 +101,45 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
   }
 
   /* =========================
-     POLLING CONTROLADO
+    POLLING CONTROLADO
   ========================== */
 
   private startPolling(): void {
+
+    const MAX_ATTEMPTS = 12;
+    let attempts = 0;
+
     this.pollingId = setInterval(() => {
 
-      if (!this.orderId) return;
-
-      if (this.order()?.status === 'PROCESSING') {
-
-        // 🔁 1. pide al backend verificar el pago
-        this.orderService.verifyPayment(this.orderId).subscribe({
-          complete: () => {
-            // 🔁 2. recarga estado después de verificar
-            this.loadAll(false);
-          }
-        });
-
+      if (!this.orderId) {
+        this.clearPolling();
+        return;
       }
+
+      const currentOrder = this.order();
+      if (!currentOrder || currentOrder.status !== 'PROCESSING') {
+        this.clearPolling();
+        return;
+      }
+      if (attempts >= MAX_ATTEMPTS) {
+        console.log('Polling detenido: tiempo máximo alcanzado');
+        this.clearPolling();
+        return;
+      }
+
+      attempts++;
+
+      this.orderService.verifyPayment(this.orderId).subscribe({
+        complete: () => {
+          this.loadAll(false);
+        },
+        error: () => {
+          console.warn('Error verificando pago');
+        }
+      });
 
     }, 5000);
   }
-
 
   private clearPolling(): void {
     if (this.pollingId) {
@@ -133,7 +149,7 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
   }
 
   /* =========================
-     LOADERS
+    LOADERS
   ========================== */
 
   private loadAll(showLoader = true): void {
@@ -169,7 +185,7 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
   }
 
   /* =========================
-     TIMELINE / UI
+    TIMELINE / UI
   ========================== */
 
   isActive(status: OrderStatus): boolean {
@@ -202,7 +218,7 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
   }
 
   /* =========================
-     ACTIONS
+    ACTIONS
   ========================== */
 
   continuePayment(): void {

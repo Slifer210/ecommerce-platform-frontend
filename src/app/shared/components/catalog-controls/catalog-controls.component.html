@@ -1,0 +1,38 @@
+<div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+
+    <div *ngIf="!loading" class="text-sm text-gray-500">
+        Mostrando
+        <span class="font-medium text-gray-900">{{ showingFrom }}</span>–
+        <span class="font-medium text-gray-900">{{ showingTo }}</span>
+        de
+        <span class="font-medium text-gray-900">{{ total }}</span>
+    </div>
+
+    <div class="flex items-center gap-3">
+
+        <select
+        class="h-10 rounded-xl border border-gray-200 bg-white px-3 text-sm text-gray-700 shadow-sm"
+        [value]="sortKey"
+        (change)="sortChange.emit($any($event.target).value)"
+        >
+        <option value="relevance">Relevancia</option>
+        <option value="newest">Más nuevos</option>
+        <option value="price_asc">Precio: menor a mayor</option>
+        <option value="price_desc">Precio: mayor a menor</option>
+        <option value="rating_desc">Mejor valorados</option>
+        </select>
+
+        <select
+        class="h-10 rounded-xl border border-gray-200 bg-white px-3 text-sm text-gray-700 shadow-sm"
+        [value]="pageSize"
+        (change)="pageSizeChange.emit($any($event.target).value)"
+        >
+        <option [value]="12">12</option>
+        <option [value]="24">24</option>
+        <option [value]="36">36</option>
+        <option [value]="48">48</option>
+        </select>
+
+    </div>
+
+</div>

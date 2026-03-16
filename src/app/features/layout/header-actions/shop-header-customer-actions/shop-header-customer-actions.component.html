@@ -73,15 +73,33 @@
 
         <!-- ÓRDENES -->
         <a
-            routerLink="/my-orders"
-            class="flex flex-col items-center text-gray-700 hover:text-black"
+        routerLink="/my-orders"
+        class="relative flex flex-col items-center text-gray-700 hover:text-black"
         >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M9 5h6M9 9h6M9 13h6M5 5h.01M5 9h.01M5 13h.01" />
-            </svg>
-            <span>Órdenes</span>
+
+        <svg xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5h6M9 9h6M9 13h6M5 5h.01M5 9h.01M5 13h.01" />
+        </svg>
+
+        <span>Órdenes</span>
+
+        <!-- CONTADOR -->
+        <span
+            *ngIf="pendingOrdersCount() > 0"
+            class="absolute -top-2 -right-2
+                bg-black text-white text-xs
+                rounded-full px-1.5"
+        >
+            {{ pendingOrdersCount() }}
+        </span>
+
         </a>
 
         <!-- NOTIFICACIONES -->

@@ -1,0 +1,43 @@
+<div
+    *ngIf="visible"
+    class="fixed inset-0 bg-black/40 backdrop-blur-[1px] flex items-center justify-center z-50"
+    [ngClass]="closing ? 'animate-fadeOut' : 'animate-fadeIn'"
+    (click)="onClose()"
+    role="dialog"
+    aria-modal="true"
+>
+
+    <div
+        class="bg-white rounded-2xl overflow-hidden relative flex flex-col shadow-2xl"
+        [style.width]="width"
+        style="max-height:80vh"
+        [ngClass]="closing ? 'animate-modalOut' : 'animate-modalIn'"
+        (click)="$event.stopPropagation()"
+    >
+
+        <!-- HEADER -->
+
+        <div class="sticky top-0 bg-white z-20 px-6 py-4 border-b border-gray-100 flex items-start justify-between gap-4">
+
+            <div class="flex-1">
+                <ng-content select="[modal-header]"></ng-content>
+            </div>
+
+            <button
+                (click)="onClose()"
+                class="text-gray-500 hover:text-black transition text-lg leading-none"
+            >
+                ✕
+            </button>
+
+        </div>
+
+        <!-- CONTENT -->
+
+        <div class="overflow-y-auto px-6 py-4 flex-1">
+            <ng-content></ng-content>
+        </div>
+
+    </div>
+
+</div>

@@ -2,194 +2,399 @@
 
     <!-- HEADER -->
     <div class="flex justify-between items-center">
-        <h1 class="text-2xl font-bold">
-        Detalle de la orden
+
+        <h1 class="text-2xl font-bold text-gray-800">
+            Detalle de la orden
         </h1>
+
         <button
-        class="text-sm text-blue-600 hover:underline"
-        (click)="goBack()">
-        ← Volver
+            class="group inline-flex items-center gap-1 text-sm font-medium text-blue-600 transition hover:text-blue-700"
+            (click)="goBack()"
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                class="h-4 w-4 transition-transform group-hover:-translate-x-0.5"
+            >
+                <path
+                    fill-rule="evenodd"
+                    d="M16.25 10a.75.75 0 0 1-.75.75H5.81l3.97 3.97a.75.75 0 1 1-1.06 1.06l-5.25-5.25a.75.75 0 0 1 0-1.06l5.25-5.25a.75.75 0 1 1 1.06 1.06L5.81 9.25H15.5a.75.75 0 0 1 .75.75Z"
+                    clip-rule="evenodd"
+                />
+            </svg>
+
+            <span>Volver</span>
+
         </button>
+
     </div>
 
     <!-- LOADING -->
     <div *ngIf="loading()" class="flex items-center gap-3 text-gray-500">
-        <span
-        class="inline-block w-5 h-5 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin">
-        </span>
+        <span class="w-5 h-5 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin"></span>
         Cargando orden...
     </div>
 
     <!-- CONTENT -->
     <ng-container *ngIf="!loading() && order() as o">
 
+
         <!-- RESUMEN -->
-        <div class="bg-white border rounded p-4 grid grid-cols-2 gap-4">
-        <div>
-            <div class="text-sm text-gray-500">Orden</div>
-            <div class="font-semibold">{{ o.orderId }}</div>
-        </div>
+        <div class="bg-white border border-gray-200 rounded-lg p-5 grid grid-cols-2 gap-6 shadow-sm">
+            
+            
 
-        <div>
-            <div class="text-sm text-gray-500">Estado</div>
-            <div class="font-semibold">
-            {{ statusLabel(o.status) }}
+            <div>
+                <div class="text-sm text-gray-500">Orden</div>
+                <div class="font-semibold text-gray-800">{{ o.orderId }}</div>
             </div>
+
+            <div>
+                <div class="text-sm text-gray-500">Estado</div>
+                <div class="font-semibold text-gray-800">
+                {{ statusLabel(o.status) }}
+                </div>
+            </div>
+
+            <div>
+                <div class="text-sm text-gray-500">Fecha</div>
+                <div class="text-gray-700">
+                {{ o.createdAt | date:'medium' }}
+                </div>
+            </div>
+
+            <div *ngIf="o.paidAt">
+                <div class="text-sm text-gray-500">Pagado el</div>
+                <div class="text-gray-700">
+                {{ o.paidAt | date:'medium' }}
+                </div>
+            </div>
+
         </div>
 
-        <div>
-            <div class="text-sm text-gray-500">Fecha</div>
-            <div>{{ o.createdAt | date:'medium' }}</div>
+
+        <!-- ========================= -->
+        <!-- COMPRADOR / DIRECCIÓN -->
+        <!-- ========================= -->
+
+        <div class="bg-white border border-gray-200 rounded-lg p-6 space-y-4 shadow-sm">
+
+            <h2 class="font-semibold text-lg text-gray-800">
+                Información del comprador
+            </h2>
+
+            <div class="grid grid-cols-2 gap-6">
+
+                <div>
+                    <div class="text-sm text-gray-500">
+                        Nombre
+                    </div>
+
+                    <div class="font-medium text-gray-800">
+                        {{ o.buyerName }}
+                    </div>
+                </div>
+
+                <div>
+                    <div class="text-sm text-gray-500">
+                        Email
+                    </div>
+
+                    <div class="text-gray-800">
+                        {{ o.buyerEmail }}
+                    </div>
+                </div>
+
+                <div>
+                    <div class="text-sm text-gray-500">
+                        Teléfono
+                    </div>
+
+                    <div class="text-gray-800">
+                        {{ o.buyerPhone }}
+                    </div>
+                </div>
+
+                <div>
+                    <div class="text-sm text-gray-500">
+                        DNI
+                    </div>
+
+                    <div class="text-gray-800">
+                        {{ o.buyerDocument }}
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="pt-2">
+
+                <div class="text-sm text-gray-500">
+                    Dirección de envío
+                </div>
+
+                <div class="text-gray-800 font-medium">
+                    {{ o.shippingAddress.addressLine }}
+                </div>
+
+                <div class="text-sm text-gray-600">
+                    {{ o.shippingAddress.district }},
+                    {{ o.shippingAddress.province }},
+                    {{ o.shippingAddress.department }}
+                </div>
+
+                <div *ngIf="o.shippingAddress.reference" class="text-sm text-gray-500">
+                    Ref: {{ o.shippingAddress.reference }}
+                </div>
+
+            </div>
+
         </div>
 
-        <div *ngIf="o.paidAt">
-            <div class="text-sm text-gray-500">Pagado el</div>
-            <div>{{ o.paidAt | date:'medium' }}</div>
-        </div>
-        </div>
-
+        <!-- ========================= -->
         <!-- PAGO PENDIENTE -->
+        <!-- ========================= -->
+
+        <div
+        *ngIf="o.status === 'PENDING'"
+        class="bg-yellow-50 border border-yellow-200 rounded-lg p-5 space-y-3">
+
+            <p class="font-semibold text-yellow-900">
+                Pago pendiente
+            </p>
+
+            <p class="text-sm text-yellow-800">
+                Aún no se ha completado el pago de esta orden.
+                Puedes continuar el proceso de pago o cancelar la orden.
+            </p>
+
+            <div class="flex gap-3 pt-2">
+
+                <button
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition"
+                (click)="continuePayment()">
+                Continuar pago
+                </button>
+
+                <button
+                class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition"
+                (click)="cancelOrder()">
+                Cancelar orden
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- ========================= -->
+        <!-- CONFIRMANDO PAGO -->
+        <!-- ========================= -->
+
         <div
         *ngIf="o.status === 'PROCESSING'"
-        class="bg-yellow-50 border border-yellow-200 rounded p-4 mt-4">
+        class="bg-blue-50 border border-blue-200 rounded-lg p-5 space-y-3">
 
-            <p class="font-medium text-yellow-900">
-            Pago pendiente
+            <p class="font-semibold text-blue-900">
+                Confirmando pago...
             </p>
 
-            <p class="text-sm text-yellow-800 mt-1">
-            Aún no se ha completado el pago de esta orden.
-            Puedes continuar el proceso de pago.
+            <p class="text-sm text-blue-800">
+                Estamos verificando tu pago con el proveedor.
+                Esto puede tardar unos segundos.
             </p>
 
-            <button
-            class="mt-3 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
-            (click)="continuePayment()">
-            Continuar pago
-            </button>
+            <div class="flex items-center gap-2 text-blue-700 text-sm">
+
+                <span class="w-4 h-4 border-2 border-blue-300 border-t-blue-600 rounded-full animate-spin"></span>
+
+                Esperando confirmación del pago
+
+            </div>
 
         </div>
 
-        <!-- COMPROBANTE (SOLO CUANDO ESTÁ PAGADO) -->
+        <!-- ========================= -->
+        <!-- COMPROBANTE -->
+        <!-- ========================= -->
+
         <div
-        *ngIf="o.status === 'PAID'"
-        class="bg-green-50 border border-green-200 rounded p-4 mt-4">
+        *ngIf="o.status !== 'PENDING' && o.status !== 'PROCESSING'"
+        class="bg-green-50 border border-green-200 rounded-lg p-5 space-y-3">
 
-        <p class="text-sm text-green-800">
-            El pago fue confirmado correctamente.  
-            Ya puedes descargar el comprobante de tu compra.
-        </p>
+            <p class="text-sm text-green-800">
+            El pago fue confirmado correctamente.
+            Puedes descargar el comprobante de tu compra en cualquier momento.
+            </p>
 
-        <button
-            class="mt-3 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+            <button
+            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition"
             (click)="downloadReceipt()">
             Descargar comprobante
-        </button>
-        </div>
-
-        <!-- ITEMS -->
-        <div class="bg-white border rounded p-4 space-y-4">
-            <h2 class="font-semibold">
-                Productos ({{ totalItems() }})
-            </h2>
-        <div
-            *ngFor="let item of o.items"
-            class="border-b py-4 last:border-0 space-y-2">
-
-            <!-- Info producto -->
-            <div class="flex justify-between">
-            <div>
-                <div class="font-medium">
-                {{ item.productName }}
-                </div>
-                <div class="text-sm text-gray-500">
-                {{ item.quantity }} × S/ {{ item.unitPrice }}
-                </div>
-            </div>
-
-            <div class="font-semibold">
-                S/ {{ item.total | number:'1.2-2' }}
-            </div>
-            </div>
-
-            <!-- REVIEW ZONE -->
-            <ng-container *ngIf="o.status === 'COMPLETED'">
-
-            <!-- Ya reseñado -->
-            <div
-                *ngIf="item.reviewed"
-                class="text-sm text-green-700 font-medium">
-                ✔ Reseña enviada
-            </div>
-
-            <!-- Botón escribir -->
-            <button
-                *ngIf="!item.reviewed && !item.showReviewForm"
-                class="text-sm text-blue-600 hover:underline"
-                (click)="item.showReviewForm = true">
-                Escribir reseña
             </button>
 
-            <!-- Formulario -->
-            <app-review-form
-                *ngIf="item.showReviewForm"
-                [productId]="item.productId"
-                [orderItemId]="item.id">
-            </app-review-form>
-
-            </ng-container>
-
         </div>
 
-        <div class="flex justify-between font-bold pt-4 border-t">
-            <span>Total</span>
-            <span>S/ {{ o.total | number:'1.2-2' }}</span>
-        </div>
-        </div>
+        <!-- ========================= -->
+        <!-- ITEMS -->
+        <!-- ========================= -->
 
+        <div class="bg-white border border-gray-200 rounded-lg p-6 space-y-6 shadow-sm">
 
-        <!-- TIMELINE PROGRESIVO -->
-        <div class="bg-white border rounded p-6 space-y-6">
-        <h2 class="font-semibold text-lg">
-            Seguimiento del pedido
-        </h2>
+            <h2 class="font-semibold text-lg text-gray-800">
+                Productos ({{ totalItems() }})
+            </h2>
 
-        <!-- Barra -->
-        <div class="relative">
-            <!-- Línea base -->
-            <div class="h-1 bg-gray-200 rounded"></div>
-
-            <!-- Progreso -->
             <div
-            class="h-1 bg-green-600 rounded absolute top-0 left-0 transition-all duration-500"
-            [style.width.%]="progressPercent()">
+            *ngFor="let item of o.items"
+            class="border-b last:border-b-0 pb-4 space-y-3">
+
+                <!-- INFO PRODUCTO -->
+                <div class="flex justify-between items-start">
+
+                    <div>
+
+                        <div
+                            class="font-medium text-gray-800 cursor-pointer hover:text-blue-600 hover:underline"
+                            (click)="goToProduct(item.productId)"
+                        >
+                            {{ item.productName }}
+                        </div>
+
+                        <div class="text-sm text-gray-500">
+                            {{ item.quantity }} × S/ {{ item.unitPrice }}
+                        </div>
+
+                        <!-- REVIEW -->
+                        <div class="mt-2 text-sm">
+
+                            <!-- SI LA ORDEN ESTA COMPLETADA -->
+                            <ng-container *ngIf="o.status === 'COMPLETED'">
+
+                                <div
+                                *ngIf="item.reviewed"
+                                class="text-green-700 font-medium">
+                                ✔ Reseña enviada
+                                </div>
+
+                                <button
+                                *ngIf="!item.reviewed"
+                                class="text-blue-600 hover:underline"
+                                (click)="openReview(item)">
+                                Escribir reseña
+                                </button>
+
+                            </ng-container>
+
+                            <!-- SI AÚN NO ESTA COMPLETADA -->
+                            <div
+                                *ngIf="o.status !== 'COMPLETED'"
+                                class="text-gray-400 italic">
+                                Podrás escribir una reseña cuando recibas el producto.
+                            </div>
+
+                        </div>
+
+                    </div> 
+                    
+                    
+                    <div class="font-semibold text-gray-800">
+                        S/ {{ item.total | number:'1.2-2' }}
+                    </div>
+                </div>
             </div>
 
-            <!-- Steps -->
-            <div class="flex justify-between mt-4">
-            <div
-                *ngFor="let status of orderFlow"
-                class="flex flex-col items-center text-center w-full">
+            <div class="flex justify-between pt-4 text-lg font-bold text-gray-800">
+                <span>Total</span>
+                <span>S/ {{ o.total | number:'1.2-2' }}</span>
+            </div>
 
+        </div>
+
+        <!-- ========================= -->
+        <!-- TIMELINE -->
+        <!-- ========================= -->
+
+        <div class="bg-white border border-gray-200 rounded-lg p-6 space-y-6 shadow-sm">
+
+            <h2 class="font-semibold text-lg text-gray-800">
+                Seguimiento del pedido
+            </h2>
+
+            <div class="relative">
+
+                <!-- Línea base -->
+                <div class="h-1 bg-gray-200 rounded"></div>
+
+                <!-- Progreso -->
                 <div
-                class="w-4 h-4 rounded-full border-2 transition-all duration-300"
-                [class.bg-green-600]="isActive(status)"
-                [class.border-green-600]="isActive(status)"
-                [class.bg-white]="!isActive(status)"
-                [class.border-gray-300]="!isActive(status)">
+                class="h-1 bg-green-600 rounded absolute top-0 left-0 transition-all duration-500"
+                [style.width.%]="progressPercent()">
                 </div>
 
+                <!-- Steps -->
+                <div class="flex justify-between mt-5">
+
                 <div
-                class="text-xs mt-2"
-                [class.font-semibold]="isCurrent(status)"
-                [class.text-green-700]="isActive(status)"
-                [class.text-gray-400]="!isActive(status)">
-                {{ statusLabel(status) }}
+                    *ngFor="let status of orderFlow"
+                    class="flex flex-col items-center text-center w-full">
+
+                    <div
+                    class="w-4 h-4 rounded-full border-2 transition-all duration-300"
+                    [class.bg-green-600]="isActive(status)"
+                    [class.border-green-600]="isActive(status)"
+                    [class.bg-white]="!isActive(status)"
+                    [class.border-gray-300]="!isActive(status)">
+                    </div>
+
+                    <div
+                    class="text-xs mt-2"
+                    [class.font-semibold]="isCurrent(status)"
+                    [class.text-green-700]="isActive(status)"
+                    [class.text-gray-400]="!isActive(status)">
+                    {{ statusLabel(status) }}
+                    </div>
+
                 </div>
+
+                </div>
+
             </div>
-            </div>
-        </div>
+
         </div>
 
     </ng-container>
+
 </div>
+
+<!-- REVIEW MODAL -->
+
+<app-modal
+    [open]="!!reviewModalItem()"
+    (close)="closeReview()"
+    width="420px"
+>
+
+    <ng-container *ngIf="reviewModalItem() as item">
+
+        <div modal-header>
+
+            <h3 class="text-lg font-semibold">
+                Escribir reseña
+            </h3>
+
+        </div>
+
+        <div class="text-sm text-gray-600 mb-4">
+            {{ item.productName }}
+        </div>
+
+        <app-review-form
+            [productId]="item.productId"
+            [orderItemId]="item.id"
+            (reviewCreated)="onReviewCreated(item, $event)">
+        </app-review-form>
+
+    </ng-container>
+
+</app-modal>

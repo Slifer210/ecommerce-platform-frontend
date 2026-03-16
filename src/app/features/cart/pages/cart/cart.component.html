@@ -15,12 +15,45 @@
     <!-- CONTENT -->
     <ng-container *ngIf="!cartState.loading() && cartState.cart() as cart">
 
-        <!-- EMPTY -->
+        <!-- EMPTY CART -->
         <div
         *ngIf="cart.items.length === 0"
-        class="text-center text-gray-500"
+        class="flex flex-col items-center justify-center py-20 text-center"
         >
-        Tu carrito está vacío 🛒
+
+            <!-- ICON -->
+            <div class="mb-6 text-gray-300">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    class="w-20 h-20">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M2.25 2.25h1.386a1.5 1.5 0 011.415 1.03l.383 1.15M7.5 14.25h8.25a1.5 1.5 0 001.46-1.155l1.38-5.52H5.318m2.182 6.675L5.318 4.43M7.5 14.25L6.75 18h10.5m-9.75 0a.75.75 0 100 1.5.75.75 0 000-1.5zm9 0a.75.75 0 100 1.5.75.75 0 000-1.5z" />
+                </svg>
+            </div>
+
+            <!-- TITLE -->
+            <h2 class="text-xl font-semibold text-gray-700 mb-2">
+                Tu carrito está vacío
+            </h2>
+
+            <!-- SUBTEXT -->
+            <p class="text-gray-500 mb-6 max-w-md">
+                Parece que aún no has agregado productos a tu carrito.
+                Explora nuestro catálogo y encuentra algo que te guste.
+            </p>
+
+            <!-- CTA -->
+            <button
+            type="button"
+            [routerLink]="['/products']"
+            class="px-6 py-3 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
+            >
+            Explorar productos
+            </button>
+
         </div>
 
         <!-- ITEMS -->

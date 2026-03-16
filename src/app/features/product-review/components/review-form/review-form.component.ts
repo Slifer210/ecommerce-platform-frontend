@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -17,10 +17,12 @@ export class ReviewFormComponent {
   @Input() productId!: string;
   @Input() orderItemId!: string;
 
+  @Output() reviewCreated = new EventEmitter<any>();
+
   rating = 5;
   comment = '';
-
   images: string[] = [];
+
   uploading = false;
 
   private cloudinary = CLOUDINARY_CONFIG;
@@ -50,14 +52,20 @@ export class ReviewFormComponent {
       formData
     ).subscribe({
       next: res => {
+
         this.images.push(res.secure_url);
         this.uploading = false;
         input.value = '';
+
       },
       error: () => {
+
+        console.error("Error subiendo imagen");
         this.uploading = false;
+
       }
     });
+
   }
 
   removeImage(index: number): void {
@@ -65,15 +73,38 @@ export class ReviewFormComponent {
   }
 
   submit(): void {
-    this.reviewService.createReview(this.productId, {
+
+    const payload = {
       orderItemId: this.orderItemId,
       rating: this.rating,
       comment: this.comment,
       imageUrls: this.images
-    }).subscribe(() => {
-      this.comment = '';
-      this.rating = 5;
-      this.images = [];
-    });
+    };
+
+    this.reviewService
+      .createReview(this.productId, payload)
+      .subscribe({
+
+        next: () => {
+
+          console.log("REVIEW CREATED");
+
+          // Emitimos el payload en lugar de la respuesta del backend
+          this.reviewCreated.emit(payload);
+
+          // reset form
+          this.comment = '';
+          this.rating = 5;
+          this.images = [];
+
+        },
+
+        error: err => {
+          console.error("Error creando reseña", err);
+        }
+
+      });
+
   }
+
 }

@@ -3,9 +3,10 @@
 
   <!-- TODAS -->
   <button
+    *ngIf="catalogState.isSearchActive()"
     class="block w-full text-left px-2 py-1 rounded"
-    [class.bg-black]="!ui.tempCategoryId()"
-    [class.text-white]="!ui.tempCategoryId()"
+    [class.bg-black]="!activeCategoryId"
+    [class.text-white]="!activeCategoryId"
     (click)="selectCategory(null)"
   >
     Todas
@@ -29,8 +30,8 @@
         <!-- CATEGORY -->
         <button
           class="flex-1 text-left px-2 py-1 rounded"
-          [class.bg-black]="ui.tempCategoryId() === c.id"
-          [class.text-white]="ui.tempCategoryId() === c.id"
+          [class.bg-black]="activeCategoryId === c.id"
+          [class.text-white]="activeCategoryId === c.id"
           (click)="selectCategory(c.id)"
         >
           {{ c.name }}
@@ -54,7 +55,7 @@
         <button
           *ngFor="let child of categoryTree.get(c.id)"
           class="block w-full text-left px-2 py-1 rounded text-sm"
-          [class.bg-gray-200]="ui.tempCategoryId() === child.id"
+          [class.bg-gray-200]="activeCategoryId === child.id"
           (click)="selectCategory(child.id)"
         >
           {{ child.name }}

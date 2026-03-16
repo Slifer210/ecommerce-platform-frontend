@@ -1,0 +1,36 @@
+<div
+    *ngIf="totalPages > 1"
+    class="flex items-center justify-center gap-2 pt-6"
+>
+
+    <!-- PREVIOUS -->
+    <button
+        class="h-10 px-4 rounded-xl border border-gray-200 text-sm hover:border-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
+        [disabled]="currentPage === 0"
+        (click)="prev()"
+    >
+        ← Anterior
+    </button>
+
+    <!-- PAGES -->
+    <button
+        *ngFor="let p of pages"
+        class="h-10 w-10 rounded-xl border text-sm transition"
+        [ngClass]="p === currentPage
+        ? 'border-black bg-black text-white'
+        : 'border-gray-200 hover:border-gray-300'"
+        (click)="go(p)"
+    >
+        {{ p + 1 }}
+    </button>
+
+    <!-- NEXT -->
+    <button
+        class="h-10 px-4 rounded-xl border border-gray-200 text-sm hover:border-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
+        [disabled]="currentPage >= totalPages - 1"
+        (click)="next()"
+    >
+        Siguiente →
+    </button>
+
+</div>

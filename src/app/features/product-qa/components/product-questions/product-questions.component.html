@@ -4,85 +4,137 @@
         Preguntas y respuestas
     </h2>
 
-    <!-- Crear pregunta (solo customer) -->
+    <!-- Crear pregunta -->
+
     <div *ngIf="!authState.isAdmin()">
         <app-create-question
-        [productId]="productId"
-        (created)="loadQuestions()">
+            [productId]="productId"
+            (created)="loadQuestions()">
         </app-create-question>
     </div>
 
-    <!-- Lista -->
-    <ng-container *ngIf="questions.length > 0; else noQuestions">
+    <!-- BOTÓN MODAL -->
 
-        <div
-        *ngFor="let q of questions"
-        class="rounded-lg px-4 py-3"
-        [ngClass]="{
-            'bg-blue-50 border-l-4 border-blue-500 ml-6': isMyQuestion(q),
-            'bg-gray-50': !isMyQuestion(q)
-        }"
+    <div class="mt-4">
+        <button
+            (click)="openModal()"
+            class="text-sm text-blue-600 hover:underline"
         >
-
-        <!-- Header -->
-        <div class="flex items-center gap-2 mb-1">
-            <span class="text-xs font-medium text-gray-700">
-            {{ q.authorName }}
-            </span>
-
-            <span
-            *ngIf="isMyQuestion(q)"
-            class="text-[11px] bg-blue-600 text-white px-2 py-0.5 rounded-full"
-            >
-            Tú
-            </span>
-
-            <span
-            *ngIf="q.authorRole === 'ADMIN'"
-            class="text-[11px] bg-green-600 text-white px-2 py-0.5 rounded-full"
-            >
-            Vendedor
-            </span>
-
-            <span class="ml-auto text-xs text-gray-400">
-            {{ q.createdAt | date:'short' }}
-            </span>
-        </div>
-
-        <!-- Pregunta -->
-        <p class="text-sm text-gray-800 leading-relaxed">
-            {{ q.question }}
-        </p>
-
-        <!-- Respuesta -->
-        <div
-            *ngIf="q.answers.length > 0"
-            class="mt-3 ml-4 border-l-2 border-green-500 pl-3"
-        >
-            <p class="text-sm text-gray-700">
-            {{ q.answers[0].answer }}
-            </p>
-        </div>
-
-        <!-- Responder (solo ADMIN) -->
-        <div
-            *ngIf="authState.isAdmin() && q.answers.length === 0"
-            class="mt-4 ml-4"
-        >
-            <app-create-answer
-            [questionId]="q.id"
-            (created)="loadQuestions()">
-            </app-create-answer>
-        </div>
-
-        </div>
-    </ng-container>
-
-    <!-- Empty -->
-    <ng-template #noQuestions>
-        <p class="text-sm text-gray-500">
-        Todavía no hay preguntas. ¡Sé el primero en preguntar!
-        </p>
-    </ng-template>
+            Ver todas las preguntas
+        </button>
+    </div>
 
 </div>
+
+
+<!-- ================= MODAL ================= -->
+
+<app-modal
+    [open]="showQuestionsModal"
+    (close)="closeModal()"
+    width="800px"
+>
+
+    <div modal-header>
+
+        <h2 class="text-xl font-semibold">
+            Preguntas de clientes
+        </h2>
+
+    </div>
+
+
+    <!-- CONTENIDO -->
+
+    <div class="overflow-y-auto">
+
+        <ng-container *ngIf="questions.length > 0; else noQuestions">
+
+            <div
+                *ngFor="let q of questions"
+                class="rounded-lg px-4 py-3 mb-4"
+                [ngClass]="{
+                    'bg-blue-50 border-l-4 border-blue-500 ml-6': isMyQuestion(q),
+                    'bg-gray-50': !isMyQuestion(q)
+                }"
+            >
+
+                <!-- Header -->
+
+                <div class="flex items-center gap-2 mb-1">
+
+                    <span class="text-xs font-medium text-gray-700">
+                        {{ q.authorName }}
+                    </span>
+
+                    <span
+                        *ngIf="isMyQuestion(q)"
+                        class="text-[11px] bg-blue-600 text-white px-2 py-0.5 rounded-full"
+                    >
+                        Tú
+                    </span>
+
+                    <span
+                        *ngIf="q.authorRole === 'ADMIN'"
+                        class="text-[11px] bg-green-600 text-white px-2 py-0.5 rounded-full"
+                    >
+                        Vendedor
+                    </span>
+
+                    <span class="ml-auto text-xs text-gray-400">
+                        {{ q.createdAt | date:'short' }}
+                    </span>
+
+                </div>
+
+                <!-- Pregunta -->
+
+                <p class="text-sm text-gray-800 leading-relaxed">
+                    {{ q.question }}
+                </p>
+
+                <!-- Respuesta -->
+
+                <div
+                    *ngIf="q.answers.length > 0"
+                    class="mt-3 ml-4 border-l-2 border-green-500 pl-3"
+                >
+
+                    <p class="text-sm text-gray-700">
+                        {{ q.answers[0].answer }}
+                    </p>
+
+                </div>
+
+                <!-- Responder ADMIN -->
+
+                <div
+                    *ngIf="authState.isAdmin() && q.answers.length === 0"
+                    class="mt-4 ml-4"
+                >
+
+                    <app-create-answer
+                        [questionId]="q.id"
+                        (created)="loadQuestions()">
+                    </app-create-answer>
+
+                </div>
+
+            </div>
+
+        </ng-container>
+
+
+        <!-- Empty state -->
+
+        <ng-template #noQuestions>
+
+            <p class="text-sm text-gray-500 text-center py-6">
+                Todavía no hay preguntas. ¡Sé el primero en preguntar!
+            </p>
+
+        </ng-template>
+
+    </div>
+
+</app-modal>

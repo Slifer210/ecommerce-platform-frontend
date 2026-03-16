@@ -23,4 +23,16 @@ export class CatalogUiState {
     this.tempCategoryId.set(null);
     this.expandedCategories.set(new Set());
   }
+
+  expandCategory(id: string) {
+
+    this.expandedCategories.update(set => {
+
+      const newSet = new Set(set);
+      newSet.add(id);
+      return newSet;
+
+    });
+
+  }
 }

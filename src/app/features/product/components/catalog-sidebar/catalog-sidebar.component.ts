@@ -26,15 +26,15 @@ export class CatalogSidebarComponent {
   @Input() rootCategories!: Category[];
   @Input() categoryTree!: Map<string | null, Category[]>;
   @Input() facetCount!: (categoryId: string) => number;
-
+  @Input() activeCategoryId!: string | null;
   /** Facets */
   @Input() facetAttributes!: AttributeFacet[];
   @Input() facetPriceRanges!: PriceRangeFacet[];
 
-  // ✅ ESTADO REAL DE LOS CHECKBOXES
-  @Input() selectedAttributes = new Map<string, string[]>();
+  // ESTADO REAL DE LOS CHECKBOXES
+  @Input() selectedAttributes: Map<string, string[]> = new Map();
 
-  // ✅ ESTADO REAL DEL PRECIO (VIENE DEL CatalogComponent)
+  // ESTADO REAL DEL PRECIO (VIENE DEL CatalogComponent)
   @Input() minPrice: number | null = null;
   @Input() maxPrice: number | null = null;
 

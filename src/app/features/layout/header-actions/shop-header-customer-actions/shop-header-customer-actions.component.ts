@@ -9,7 +9,8 @@ import { AddressState } from '../../../address/models/address.state';
 import { AddressApiService } from '../../../address/services/address-api.service';
 import { NotificationState } from '../../../notification/state/notification.state';
 import { NotificationDropdownComponent } from '../../../notification/components/notification-dropdown/notification-dropdown.component';
-
+import { signal } from '@angular/core';
+import { OrderService } from '../../../order/services/order.service';
 @Component({
   selector: 'app-shop-header-customer-actions',
   standalone: true,
@@ -25,6 +26,7 @@ export class ShopHeaderCustomerActionsComponent
   implements OnInit, OnDestroy {
 
   profileImageUrl: string | null = null;
+  readonly pendingOrdersCount = signal<number>(0);
 
   /** evita ejecuciones múltiples */
   private cleanedUp = false;
@@ -35,12 +37,9 @@ export class ShopHeaderCustomerActionsComponent
     public addressState: AddressState,
     private addressApi: AddressApiService,
     private notificationState: NotificationState,
+    private orderService: OrderService,
     private router: Router
   ) {
-    /**
-     * 🔁 Reaccionar a cambios del usuario
-     * ⚠️ Este effect ESCRIBE signals → allowSignalWrites: true
-     */
     effect(
       () => {
         const user = this.authState.user();
@@ -70,6 +69,12 @@ export class ShopHeaderCustomerActionsComponent
     // notificaciones
     this.notificationState.loadDropdown();
     this.notificationState.startPolling();
+
+    // órdenes pendientes
+    this.orderService.getPendingOrdersCount().subscribe({
+      next: res => this.pendingOrdersCount.set(res.count),
+      error: () => this.pendingOrdersCount.set(0)
+    });
 
     // dirección
     this.addressApi.getDefault().subscribe({

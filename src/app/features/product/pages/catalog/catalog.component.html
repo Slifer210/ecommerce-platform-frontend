@@ -1,112 +1,158 @@
-<main class="catalog-page max-w-7xl mx-auto px-6 py-16 space-y-20">
+<main class="catalog-page max-w-7xl mx-auto px-6 py-10">
 
-  <!-- ================= HERO ================= -->
-  <section
-    *ngIf="!exploreMode() && !catalogState.hasActiveFilters() && hero()"
-    class="text-center space-y-4"
-  >
-    <h1 class="text-3xl font-semibold text-gray-900">
-      {{ hero()?.title }}
-    </h1>
+  <div class="space-y-20">
 
-    <p class="text-gray-500 max-w-2xl mx-auto">
-      {{ hero()?.subtitle }}
-    </p>
-  </section>
+    <!-- ================= HERO ================= -->
+    <section
+      *ngIf="!exploreMode() && !catalogState.hasActiveFilters() && hero()"
+      class="text-center max-w-3xl mx-auto space-y-6"
+    >
+      <h1 class="text-4xl font-semibold text-gray-900 tracking-tight">
+        {{ hero()?.title }}
+      </h1>
 
-
-  <!-- ================= QUICK CATEGORIES ================= -->
-  <section
-    *ngIf="!exploreMode() && !catalogState.hasActiveFilters() && quickCategories().length > 0"
-    class="flex justify-center"
-  >
-    <div class="flex flex-wrap justify-center gap-3 max-w-3xl">
-      <button
-        *ngFor="let c of quickCategories()"
-        (click)="onCategorySelect(c.id)"
-        class="px-5 py-2 text-sm bg-gray-100 rounded-full transition hover:bg-black hover:text-white"
-      >
-        {{ c.name }}
-      </button>
-    </div>
-  </section>
+      <p class="text-gray-500 text-lg leading-relaxed">
+        {{ hero()?.subtitle }}
+      </p>
+    </section>
 
 
-  <!-- ================= TRENDING ================= -->
-  <section
-    *ngIf="!exploreMode() && !catalogState.hasActiveFilters() && trending().length > 0"
-    class="space-y-8"
-  >
-    <header class="flex items-center justify-between">
-      <h2 class="text-xl font-semibold">
-        🔥 Tendencia ahora
-      </h2>
-
-      <button
-        class="text-sm text-gray-600 hover:text-black transition flex items-center gap-1 group"
-        (click)="goToExploreMode()"
-      >
-        Explorar todo
-        <span class="transform transition group-hover:translate-x-1">
-          →
-        </span>
-      </button>
-    </header>
-
-    <!-- Slider -->
-    <div class="relative">
-
-      <!-- Left Arrow -->
-      <button
-        (click)="scrollTrending('left')"
-        class="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-10 w-10 bg-white shadow-md rounded-full flex items-center justify-center hover:bg-gray-100 transition"
-      >
-        ‹
-      </button>
-
-      <!-- Right Arrow -->
-      <button
-        (click)="scrollTrending('right')"
-        class="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-10 w-10 bg-white shadow-md rounded-full flex items-center justify-center hover:bg-gray-100 transition"
-      >
-        ›
-      </button>
-
-      <!-- Products -->
-      <div
-        #trendingContainer
-        class="flex gap-6 overflow-hidden scroll-smooth px-12"
-      >
-        <article
-          *ngFor="let p of trending()"
-          (click)="goToProduct(p.id)"
-          class="min-w-[240px] max-w-[240px] bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer"
+    <!-- ================= QUICK CATEGORIES ================= -->
+    <section
+      *ngIf="!exploreMode() && !catalogState.hasActiveFilters() && quickCategories().length > 0"
+      class="flex justify-center"
+    >
+      <div class="flex flex-wrap justify-center gap-4 max-w-4xl">
+        <button
+          *ngFor="let c of quickCategories()"
+          (click)="onCategorySelect(c.id)"
+          class="px-5 py-2.5 text-sm font-medium
+                 bg-gray-100 rounded-full
+                 transition hover:bg-black hover:text-white"
         >
-          <figure class="relative bg-gray-50 flex items-center justify-center aspect-square">
-            <img
-              [src]="p.mainImageUrl"
-              class="h-64 w-full object-contain transition-transform duration-300 group-hover:scale-105"
-            />
-          </figure>
-
-          <div class="p-4 space-y-2">
-            <h3 class="text-sm font-medium line-clamp-2">
-              {{ p.name }}
-            </h3>
-
-            <div class="text-sm font-semibold">
-              S/ {{ p.price }}
-            </div>
-          </div>
-        </article>
+          {{ c.name }}
+        </button>
       </div>
+    </section>
+
+
+    <!-- ================= VER TODOS ================= -->
+    <section
+      *ngIf="!exploreMode() && !catalogState.hasActiveFilters()"
+      class="flex justify-center pt-4"
+    >
+      <button
+        (click)="goToExploreMode()"
+        class="group inline-flex items-center gap-2 text-sm font-medium
+               text-gray-600 transition hover:text-black"
+      >
+        Ver todos los productos
+
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+        </svg>
+      </button>
+    </section>
+
+
+    <!-- ================= SECTIONS ================= -->
+
+    <div class="space-y-28">
+
+      <!-- TRENDING -->
+      <app-product-slider-section
+        *ngIf="!exploreMode() && !catalogState.hasActiveFilters() && trending().length > 0"
+        title="Tendencia ahora"
+        subtitle="Lo más buscado en este momento"
+        [products]="trending()"
+        (productClick)="goToProduct($event)"
+        (addToCartClick)="addToCart($event)"
+      >
+        <svg icon xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+            class="h-5 w-5">
+          <path d="M12 2C9 6 5 8 5 13a7 7 0 1014 0c0-3-2-5-4-7 0 3-1 5-3 6-1-2-1-5 0-10z"/>
+        </svg>
+      </app-product-slider-section>
+
+
+      <!-- BEST SELLERS -->
+      <app-product-slider-section
+        *ngIf="!exploreMode() && !catalogState.hasActiveFilters() && bestSellers().length > 0"
+        title="Más vendidos"
+        subtitle="Los productos preferidos por nuestros clientes"
+        [products]="bestSellers()"
+        (productClick)="goToProduct($event)"
+        (addToCartClick)="addToCart($event)"
+      >
+        <svg icon xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            class="h-5 w-5">
+          <path stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 2l1 4h10l1-4M4 6h16l-1.5 14h-13L4 6z"/>
+        </svg>
+      </app-product-slider-section>
+
+
+      <!-- NEW PRODUCTS -->
+      <app-product-slider-section
+        *ngIf="!exploreMode() && !catalogState.hasActiveFilters() && newProducts().length > 0"
+        title="Nuevos productos"
+        subtitle="Últimos productos añadidos al catálogo"
+        [products]="newProducts()"
+        (productClick)="goToProduct($event)"
+        (addToCartClick)="addToCart($event)"
+      >
+        <svg icon xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            class="h-5 w-5">
+          <path stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 3v6m0 0l2-2m-2 2L10 7m2 6v8m6-6H6"/>
+        </svg>
+      </app-product-slider-section>
+
+
+      <!-- TOP RATED -->
+      <app-product-slider-section
+        *ngIf="!exploreMode() && !catalogState.hasActiveFilters() && topRated().length > 0"
+        title="Mejor valorados"
+        subtitle="Productos con las mejores reseñas"
+        [products]="topRated()"
+        (productClick)="goToProduct($event)"
+        (addToCartClick)="addToCart($event)"
+      >
+        <svg icon xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+            class="h-5 w-5">
+          <path d="M12 2l2.9 6.9 7.5.6-5.7 4.8 1.7 7.2L12 18l-6.4 3.5 1.7-7.2L1.6 9.5l7.5-.6L12 2z"/>
+        </svg>
+      </app-product-slider-section>
 
     </div>
-  </section>
+
+  </div>
+
   
   <!-- ================= MAIN LAYOUT ================= -->
   <section 
-    *ngIf="exploreMode() || catalogState.hasActiveFilters()"
+    *ngIf="exploreMode() || catalogState.hasActiveFilters() || catalogState.searchApplied()"
     class="grid grid-cols-1 md:grid-cols-4 gap-12"
   >
     <!-- SIDEBAR -->
@@ -118,6 +164,7 @@
         <app-catalog-sidebar
           [rootCategories]="rootCategories()"
           [categoryTree]="categoryTree()"
+          [activeCategoryId]="appliedCategoryId()"
           [facetCount]="getFacetCount.bind(this)"
           [facetAttributes]="facetAttributes()"
           [facetPriceRanges]="facetPriceRanges()"
@@ -145,44 +192,11 @@
       <!-- TOP BAR -->
       <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
 
-        <nav
-          *ngIf="breadcrumb().length > 0"
-          class="flex flex-wrap items-center gap-2 text-sm text-gray-500"
-        >
-
-          <!-- Inicio -->
-          <span
-            class="cursor-pointer hover:text-black transition"
-            (click)="clearSearchAndReset()"
-          >
-            Inicio
-          </span>
-
-          <span>/</span>
-
-          <!-- Categorías -->
-          <ng-container *ngFor="let c of breadcrumb(); let last = last">
-
-            <span
-              *ngIf="!last"
-              class="cursor-pointer hover:text-black transition"
-              (click)="onCategorySelect(c.id)"
-            >
-              {{ c.name }}
-            </span>
-
-            <span
-              *ngIf="last"
-              class="font-medium text-black"
-            >
-              {{ c.name }}
-            </span>
-
-            <span *ngIf="!last">/</span>
-
-          </ng-container>
-
-        </nav>
+        <app-breadcrumb
+          [items]="breadcrumb()"
+          (homeClick)="clearSearchAndReset()"
+          (categoryClick)="onCategorySelect($event.toString())"
+        ></app-breadcrumb>
 
         <span *ngIf="!loading()" class="text-sm text-gray-500">
           {{ totalElements() }} resultado(s)
@@ -190,46 +204,17 @@
 
       </header>
 
-
       <!-- CONTROLS BAR -->
-      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-
-        <div *ngIf="!loading()" class="text-sm text-gray-500">
-          Mostrando
-          <span class="font-medium text-gray-900">{{ showingFrom() }}</span>–
-          <span class="font-medium text-gray-900">{{ showingTo() }}</span>
-          de
-          <span class="font-medium text-gray-900">{{ totalElements() }}</span>
-        </div>
-
-        <div class="flex items-center gap-3">
-
-          <select
-            class="h-10 rounded-xl border border-gray-200 bg-white px-3 text-sm text-gray-700 shadow-sm"
-            [value]="sortKey()"
-            (change)="onSortChange($any($event.target).value)"
-          >
-            <option value="relevance">Relevancia</option>
-            <option value="newest">Más nuevos</option>
-            <option value="price_asc">Precio: menor a mayor</option>
-            <option value="price_desc">Precio: mayor a menor</option>
-            <option value="rating_desc">Mejor valorados</option>
-          </select>
-
-          <select
-            class="h-10 rounded-xl border border-gray-200 bg-white px-3 text-sm text-gray-700 shadow-sm"
-            [value]="pageSize()"
-            (change)="onPageSizeChange($any($event.target).value)"
-          >
-            <option [value]="12">12</option>
-            <option [value]="24">24</option>
-            <option [value]="36">36</option>
-            <option [value]="48">48</option>
-          </select>
-
-        </div>
-      </div>
-
+      <app-catalog-controls
+          [loading]="loading()"
+          [showingFrom]="showingFrom()"
+          [showingTo]="showingTo()"
+          [total]="totalElements()"
+          [sortKey]="sortKey()"
+          [pageSize]="pageSize()"
+          (sortChange)="onSortChange($event)"
+          (pageSizeChange)="onPageSizeChange($event)"
+        ></app-catalog-controls>
 
       <!-- STATES -->
       <section class="space-y-10">
@@ -252,84 +237,22 @@
           *ngIf="!loading() && products().length > 0"
           class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12"
         >
-          <article
+          <app-product-card
             *ngFor="let p of products()"
-            (click)="goToProduct(p.id)"
-            class="group cursor-pointer flex flex-col bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
-          >
-
-            <figure *ngIf="p.mainImageUrl" class="relative bg-gray-50">
-              <img
-                [src]="p.mainImageUrl"
-                alt="{{ p.name }}"
-                class="h-64 w-full object-contain transition-transform duration-300 group-hover:scale-105"
-              />
-            </figure>
-
-            <div class="flex flex-col flex-1 p-6 space-y-4">
-
-              <h2 class="text-lg font-semibold text-gray-900">
-                {{ p.name }}
-              </h2>
-
-              <p class="text-sm text-gray-500 line-clamp-3 flex-1">
-                {{ p.description }}
-              </p>
-
-              <div class="text-xl font-semibold text-gray-900">
-                S/ {{ p.price }}
-              </div>
-
-              <div
-                *ngIf="p.stock === 0"
-                class="text-xs text-red-500"
-              >
-                Sin stock
-              </div>
-
-              <button
-                (click)="addToCart(p.id); $event.stopPropagation()"
-                [disabled]="p.stock === 0"
-                class="w-full py-3 rounded-xl bg-black text-white text-sm font-medium transition hover:bg-gray-900 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                {{ p.stock === 0 ? 'Sin stock' : 'Agregar al carrito' }}
-              </button>
-
-            </div>
-
-          </article>
+            [product]="p"
+            (productClick)="goToProduct($event)"
+            (addToCartClick)="addToCart($event)"
+          ></app-product-card>
         </div>
-
 
         <!-- PAGINATION -->
-        <div *ngIf="!loading() && totalPages() > 1" class="flex items-center justify-center gap-2 pt-6">
-          <button
-            class="h-10 px-4 rounded-xl border border-gray-200 text-sm hover:border-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
-            [disabled]="currentPage() === 0"
-            (click)="goToPage(currentPage() - 1)"
-          >
-            ← Anterior
-          </button>
-
-          <button
-            *ngFor="let p of pageNumbers()"
-            class="h-10 w-10 rounded-xl border text-sm transition"
-            [ngClass]="p === currentPage()
-              ? 'border-black bg-black text-white'
-              : 'border-gray-200 hover:border-gray-300'"
-            (click)="goToPage(p)"
-          >
-            {{ p + 1 }}
-          </button>
-
-          <button
-            class="h-10 px-4 rounded-xl border border-gray-200 text-sm hover:border-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
-            [disabled]="currentPage() >= totalPages() - 1"
-            (click)="goToPage(currentPage() + 1)"
-          >
-            Siguiente →
-          </button>
-        </div>
+        <app-pagination
+          *ngIf="!loading() && totalPages() > 1"
+          [currentPage]="currentPage()"
+          [totalPages]="totalPages()"
+          [pages]="pageNumbers()"
+          (pageChange)="goToPage($event)"
+        ></app-pagination>
 
       </section>
 
@@ -338,3 +261,22 @@
   </section>
 
 </main>
+
+<!-- ================= WHATSAPP FLOAT BUTTON ================= -->
+<a
+  href="https://wa.me/51916337058?text=Hola%20quiero%20informacion%20sobre%20sus%20productos"
+  target="_blank"
+  class="fixed bottom-6 right-6 z-50 flex items-center justify-center
+          w-14 h-14 rounded-full bg-green-500 text-white
+          shadow-lg hover:bg-green-600 hover:scale-110
+          transition animate-bounce"
+>
+    <svg xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 32 32"
+        fill="currentColor"
+        class="w-7 h-7">
+
+      <path d="M19.11 17.39c-.27-.14-1.58-.78-1.83-.87-.25-.09-.43-.14-.61.14-.18.27-.7.87-.86 1.05-.16.18-.32.2-.59.07-.27-.14-1.13-.42-2.15-1.34-.79-.7-1.33-1.56-1.48-1.83-.16-.27-.02-.41.12-.54.13-.13.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.61-1.48-.84-2.03-.22-.53-.45-.46-.61-.47l-.52-.01c-.18 0-.48.07-.73.34-.25.27-.96.94-.96 2.29 0 1.34.98 2.63 1.12 2.81.14.18 1.93 2.95 4.67 4.13.65.28 1.16.45 1.56.58.66.21 1.26.18 1.73.11.53-.08 1.58-.65 1.8-1.27.23-.63.23-1.17.16-1.27-.07-.09-.25-.14-.52-.27z"/>
+      <path d="M26.67 5.33C23.91 2.58 20.24 1.07 16.33 1.07 8.75 1.07 2.6 7.21 2.6 14.8c0 2.6.68 5.14 1.98 7.37L2.4 30.93l8.95-2.15c2.17 1.18 4.62 1.81 7.1 1.81h.01c7.58 0 13.73-6.15 13.73-13.73 0-3.9-1.52-7.56-4.27-10.33zM16.33 28.2h-.01c-2.21 0-4.37-.59-6.26-1.7l-.45-.27-5.31 1.27 1.41-5.18-.29-.47c-1.23-2-1.88-4.3-1.88-6.64 0-6.92 5.63-12.55 12.55-12.55 3.35 0 6.49 1.31 8.86 3.68 2.37 2.37 3.68 5.51 3.68 8.86 0 6.92-5.63 12.55-12.55 12.55z"/>
+    </svg>
+</a>

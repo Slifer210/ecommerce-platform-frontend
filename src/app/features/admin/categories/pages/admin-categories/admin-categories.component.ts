@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -19,6 +19,9 @@ export class AdminCategoriesComponent implements OnInit {
   name = '';
   parentId: string | null = null;
   editing?: Category;
+
+  @ViewChild('formTop', { static: true }) formTop!: ElementRef;
+  @ViewChild('nameInput', { static: true }) nameInput!: ElementRef;
 
   constructor(
     private categoryService: AdminCategoryService,
@@ -81,9 +84,22 @@ export class AdminCategoriesComponent implements OnInit {
   }
 
   edit(category: Category): void {
+
     this.editing = category;
     this.name = category.name;
     this.parentId = category.parentId ?? null;
+
+    setTimeout(() => {
+
+      const container = document.querySelector('main');
+
+      container?.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+
+    });
+
   }
 
   delete(id: string): void {

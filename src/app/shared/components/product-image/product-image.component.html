@@ -1,0 +1,39 @@
+<div class="relative bg-gray-50 h-64 flex items-center justify-center overflow-hidden">
+
+    <!-- IMAGE -->
+    <img
+        *ngIf="src && !imageError"
+        [src]="src"
+        [alt]="alt"
+        loading="lazy"
+        (error)="onError()"
+        class="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
+    />
+
+    <!-- FALLBACK -->
+    <div
+        *ngIf="!src || imageError"
+        class="flex flex-col items-center justify-center text-gray-400"
+    >
+
+        <!-- Camera Icon -->
+        <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="w-16 h-16"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        stroke-width="1.5"
+        >
+
+        <path stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M3 7h4l2-2h6l2 2h4v12H3V7z"/>
+
+        <circle cx="12" cy="13" r="3"/>
+
+        </svg>
+
+    </div>
+
+</div>

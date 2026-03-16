@@ -1,0 +1,50 @@
+<article
+    (click)="onProductClick()"
+    class="group cursor-pointer flex flex-col h-full bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+>
+
+    <!-- IMAGE -->
+    <app-product-image
+        [src]="product.mainImageUrl"
+        [alt]="product.name"
+    ></app-product-image>
+
+
+    <!-- CONTENT -->
+    <div class="flex flex-col flex-1 p-6 space-y-3">
+
+        <!-- TITLE -->
+        <h2 class="text-lg font-semibold text-gray-900 line-clamp-2 min-h-[3.5rem]">
+        {{ product.name }}
+        </h2>
+
+        <!-- DESCRIPTION -->
+        <p class="text-sm text-gray-500 line-clamp-3 min-h-[4.5rem]">
+        {{ product.description }}
+        </p>
+
+        <!-- PRICE -->
+        <div class="text-xl font-semibold text-gray-900 pt-1">
+        S/ {{ product.price }}
+        </div>
+
+        <!-- STOCK -->
+        <div
+        *ngIf="product.stock === 0"
+        class="text-xs text-red-500"
+        >
+        Sin stock
+        </div>
+
+        <!-- BUTTON -->
+        <button
+        (click)="onAddToCart($event)"
+        [disabled]="product.stock === 0"
+        class="mt-auto w-full py-3 rounded-xl bg-black text-white text-sm font-medium transition hover:bg-gray-900 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+        {{ product.stock === 0 ? 'Sin stock' : 'Agregar al carrito' }}
+        </button>
+
+    </div>
+
+</article>

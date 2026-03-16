@@ -1,4 +1,60 @@
-/* You can add global styles to this file, and also import other style files */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ===============================
+   OVERLAY ANIMATIONS
+================================ */
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.18s ease-out forwards;
+}
+
+.animate-fadeOut {
+    animation: fadeOut 0.18s ease-out forwards;
+}
+
+
+/* ===============================
+   MODAL ANIMATIONS
+================================ */
+
+@keyframes modalIn {
+    from {
+        opacity: 0;
+        transform: translate3d(0,12px,0) scale(.96);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0,0,0) scale(1);
+    }
+}
+
+@keyframes modalOut {
+    from {
+        opacity: 1;
+        transform: translate3d(0,0,0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translate3d(0,10px,0) scale(.96);
+    }
+}
+
+.animate-modalIn {
+    animation: modalIn 0.22s cubic-bezier(.16,.84,.44,1) forwards;
+}
+
+.animate-modalOut {
+    animation: modalOut 0.18s ease-in forwards;
+}

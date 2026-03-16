@@ -14,6 +14,10 @@ export class ProfileApiService {
         return this.http.get<Profile>(`${this.baseUrl}/profile`);
     }
 
+    consultDni(dni: string) {
+        return this.http.get<any>(`${this.baseUrl}/profile/identity/dni/${dni}`);
+    }
+
     updateProfile(payload: {
         fullName: string;
         identityDocumentTypeId: string | null;

@@ -1,0 +1,75 @@
+<section *ngIf="products.length > 0" class="space-y-8 mb-14">
+
+    <!-- HEADER -->
+    <header class="flex items-center gap-3">
+
+        <div class="h-10 w-10 flex items-center justify-center rounded-xl bg-gray-100 text-gray-600">
+        <ng-content select="[icon]"></ng-content>
+        </div>
+
+        <div>
+        <h2 class="text-xl font-semibold text-gray-900">
+            {{ title }}
+        </h2>
+
+        <p class="text-sm text-gray-500">
+            {{ subtitle }}
+        </p>
+        </div>
+
+    </header>
+
+
+    <!-- SLIDER -->
+    <div class="relative">
+
+        <!-- LEFT -->
+        <button
+        (click)="scroll('left')"
+        class="absolute -left-6 top-1/2 -translate-y-1/2 z-10
+                h-11 w-11 rounded-full bg-white shadow-lg
+                flex items-center justify-center
+                hover:bg-gray-100 transition"
+        >
+        ‹
+        </button>
+
+        <!-- RIGHT -->
+        <button
+        (click)="scroll('right')"
+        class="absolute -right-6 top-1/2 -translate-y-1/2 z-10
+                h-11 w-11 rounded-full bg-white shadow-lg
+                flex items-center justify-center
+                hover:bg-gray-100 transition"
+        >
+        ›
+        </button>
+
+
+        <!-- VIEWPORT -->
+        <div class="overflow-hidden">
+
+            <!-- TRACK -->
+            <div
+                #container
+                class="flex gap-2 transition-transform duration-500 ease-out"
+                [style.transform]="'translateX(-' + currentOffset + 'px)'"
+            >
+
+                <app-product-card
+                #card
+                *ngFor="let p of products"
+                [product]="p"
+                (productClick)="productClick.emit($event)"
+                (addToCartClick)="addToCartClick.emit($event)"
+                class="min-w-[240px] max-w-[240px]"
+                >
+                </app-product-card>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>

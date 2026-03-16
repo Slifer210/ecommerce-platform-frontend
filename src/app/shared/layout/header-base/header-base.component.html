@@ -1,9 +1,21 @@
 <header class="bg-white border-b shadow-sm">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
 
-        <!-- LOGO -->
-        <a [routerLink]="homeLink" class="text-xl font-bold">
-        E-Shop
+        <a
+        [routerLink]="homeLink"
+        class="flex items-center gap-2 text-xl font-semibold tracking-tight text-gray-900 hover:opacity-80 transition"
+        >
+
+            <!-- icon -->
+            <div class="flex items-center justify-center w-7 h-7 bg-black text-white rounded-md text-sm font-bold">
+                E
+            </div>
+
+            <!-- brand -->
+            <span class="hidden sm:block">
+                Shop
+            </span>
+
         </a>
 
         <!-- SLOT CENTRAL -->

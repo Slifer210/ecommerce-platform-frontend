@@ -1,13 +1,13 @@
-<h1 class="text-2xl font-bold mb-2">Categorías</h1>
+<h1 #formTop class="text-2xl font-bold mb-2">Categorías</h1>
 
-<p class="text-sm text-gray-600 mb-6">
+<p #nameInput class="text-sm text-gray-600 mb-6">
     Organiza tu catálogo usando categorías principales y subcategorías.
 </p>
 
 <!-- ========================= -->
 <!-- FORMULARIO -->
 <!-- ========================= -->
-<div class="bg-white border rounded p-4 mb-6">
+<div  class="bg-white border rounded p-4 mb-6">
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
 
@@ -17,9 +17,9 @@
             Nombre de la categoría
         </label>
         <input
-            class="border p-2 rounded w-full"
-            placeholder="Ej: Laptops"
-            [(ngModel)]="name"
+        class="border p-2 rounded w-full"
+        placeholder="Ej: Laptops"
+        [(ngModel)]="name"
         />
         </div>
 

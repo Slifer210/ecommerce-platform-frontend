@@ -1,0 +1,40 @@
+<nav
+    *ngIf="items.length > 0"
+    class="flex flex-wrap items-center gap-2 text-sm text-gray-500"
+>
+
+    <!-- HOME -->
+    <span
+        class="cursor-pointer hover:text-black transition"
+        (click)="homeClick.emit()"
+    >
+        Inicio
+    </span>
+
+    <span>/</span>
+
+    <!-- ITEMS -->
+    <ng-container *ngFor="let c of items; let last = last">
+
+        <!-- clickable -->
+        <span
+        *ngIf="!last"
+        class="cursor-pointer hover:text-black transition"
+        (click)="categoryClick.emit(c.id)"
+        >
+        {{ c.name }}
+        </span>
+
+        <!-- last item -->
+        <span
+        *ngIf="last"
+        class="font-medium text-black"
+        >
+        {{ c.name }}
+        </span>
+
+        <span *ngIf="!last">/</span>
+
+    </ng-container>
+
+</nav>

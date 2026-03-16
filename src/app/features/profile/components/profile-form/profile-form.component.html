@@ -32,47 +32,38 @@
 
         <div class="text-sm text-gray-600">
             <p>Foto de perfil</p>
-            <p class="text-xs">
-                Puedes cambiarla cuando quieras.
+            <p class="text-xs text-gray-500">
+                Opcional. Puedes agregarla cuando quieras.
             </p>
         </div>
     </div>
 
     <!-- PROGRESO PERFIL -->
     <div class="space-y-1">
-    <div class="flex justify-between text-xs text-gray-600">
-        <span>{{ progressLabel }}</span>
-        <span>{{ profileProgress }}%</span>
-    </div>
+        <div class="flex justify-between text-xs text-gray-600">
+            <span>{{ progressLabel }}</span>
+            <span>{{ profileProgress }}%</span>
+        </div>
 
-    <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-        <div
-        class="h-full transition-all duration-300"
-        [ngClass]="progressColor"
-        [style.width.%]="profileProgress"
-        ></div>
-    </div>
-    </div>
-
-
-    <!-- NOMBRE -->
-    <div>
-        <label class="block text-sm font-medium">Nombre completo</label>
-        <input
-            type="text"
-            formControlName="fullName"
-            class="border rounded w-full px-3 py-2"
-        />
+        <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div
+                class="h-full transition-all duration-300"
+                [ngClass]="progressColor"
+                [style.width.%]="profileProgress"
+            ></div>
+        </div>
     </div>
 
     <!-- TIPO DOCUMENTO -->
     <div>
         <label class="block text-sm font-medium">Tipo de documento</label>
+
         <select
             formControlName="identityDocumentTypeId"
             class="border rounded w-full px-3 py-2"
         >
             <option [ngValue]="null">Seleccionar</option>
+
             <option *ngFor="let t of documentTypes" [ngValue]="t.id">
                 {{ t.name }}
             </option>
@@ -82,20 +73,57 @@
     <!-- NUMERO DOCUMENTO -->
     <div>
         <label class="block text-sm font-medium">Número de documento</label>
+
+        <div class="flex gap-2">
+
+            <input
+                type="text"
+                formControlName="identityDocumentNumber"
+                class="border rounded w-full px-3 py-2"
+                placeholder="Ingresa tu DNI"
+            />
+
+            <button
+                type="button"
+                (click)="verifyDni()"
+                [disabled]="form.controls.identityDocumentNumber.value?.length !== 8"
+                class="px-3 py-2 bg-gray-800 text-white rounded text-sm disabled:opacity-50"
+            >
+                Verificar DNI
+            </button>
+
+        </div>
+
+        <p *ngIf="dniLoading" class="text-xs text-gray-500 mt-1">
+            Consultando RENIEC...
+        </p>
+    </div>
+
+    <!-- NOMBRE -->
+    <div>
+        <label class="block text-sm font-medium">Nombre completo</label>
+
         <input
             type="text"
-            formControlName="identityDocumentNumber"
+            formControlName="fullName"
             class="border rounded w-full px-3 py-2"
+            placeholder="Se completará automáticamente con el DNI"
         />
+
+        <p class="text-xs text-gray-500 mt-1">
+            Si verificas tu DNI, el nombre se completará automáticamente.
+        </p>
     </div>
 
     <!-- TELEFONO -->
     <div>
         <label class="block text-sm font-medium">Teléfono</label>
+
         <input
             type="text"
             formControlName="phone"
             class="border rounded w-full px-3 py-2"
+            placeholder="Ej: 987654321"
         />
     </div>
 
@@ -118,4 +146,5 @@
             Guardar
         </button>
     </div>
+
 </form>

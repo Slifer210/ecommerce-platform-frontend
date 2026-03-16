@@ -66,5 +66,10 @@ export class OrderService {
     }
 
 
+    getPendingOrdersCount() {
+        return this.http.get<{count:number}>('/api/orders/pending-count');
+    }
+
+
 
 }

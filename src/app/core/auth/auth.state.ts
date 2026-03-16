@@ -64,8 +64,9 @@ export class AuthState {
     /* =========================
     * USER
     * ========================= */
-    loadUser(): Observable<MeResponse | null> {
-        console.debug('[AuthState] loadUser called');
+    loadUser(force = false): Observable<MeResponse | null> {
+
+        console.debug('[AuthState] loadUser called', { force });
 
         if (!this._token()) {
             console.warn('[AuthState] loadUser aborted: no token');
@@ -73,12 +74,13 @@ export class AuthState {
             return of(null);
         }
 
-        if (this._user()) {
+        if (this._user() && !force) {
             console.debug('[AuthState] loadUser skipped: user already loaded', this._user());
             return of(this._user());
         }
 
         console.debug('[AuthState] loading user from API');
+
         this._loading.set(true);
 
         return this.authService.me().pipe(
@@ -89,16 +91,12 @@ export class AuthState {
             }),
             catchError(error => {
                 console.error('[AuthState] loadUser error', error);
-
-                // ✅ CORRECCIÓN CLAVE:
-                // NO borrar token ni sesión acá
                 this.clearState();
-
                 return of(null);
             })
         );
     }
-
+    
     loadUserAndRedirect(router: Router): void {
         console.debug('[AuthState] loadUserAndRedirect called');
 

@@ -1,3 +1,4 @@
+import { Address } from '../../address/models/address.model';
 import { OrderStatus } from './order-summary.model';
 
 export interface OrderDetail {
@@ -6,6 +7,11 @@ export interface OrderDetail {
     total: number;
     createdAt: string;
     paidAt?: string;
+    buyerName: string;
+    buyerEmail: string;
+    buyerPhone: string;
+    buyerDocument: string;
+    shippingAddress: Address;
     items: OrderItem[];
 }
 

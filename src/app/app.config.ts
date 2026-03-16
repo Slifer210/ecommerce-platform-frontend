@@ -1,5 +1,5 @@
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import {
   provideHttpClient,
   withInterceptors
@@ -13,10 +13,17 @@ import { apiUrlInterceptor } from './core/interceptors/api-url.interceptor';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes),
+
+    provideRouter(
+      routes,
+      withInMemoryScrolling({
+        scrollPositionRestoration: 'top'
+      })
+    ),
+
     provideHttpClient(
       withInterceptors([
-        apiUrlInterceptor,  
+        apiUrlInterceptor,
         authInterceptor,
         authErrorInterceptor
       ])

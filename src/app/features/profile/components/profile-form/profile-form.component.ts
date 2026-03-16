@@ -33,11 +33,11 @@ export class ProfileFormComponent implements OnInit {
   documentTypes: IdentityDocumentType[] = [];
   loading = true;
   saving = false;
+  dniLoading = false;
 
   form!: FormGroup<ProfileForm>;
   profileImageUrl: string | null = null;
 
-  // config centralizada
   private cloudinary = CLOUDINARY_CONFIG;
 
   constructor(
@@ -67,19 +67,24 @@ export class ProfileFormComponent implements OnInit {
       profile: this.profileApi.getProfile()
     }).subscribe({
       next: ({ types, profile }) => {
+
         this.documentTypes = types ?? [];
+
         if (profile) {
           this.patchProfile(profile);
         }
+
         this.loading = false;
       },
       error: (error) => {
+
         this.loading = false;
+
         if (error.status === 401) return;
+
         if (error.status >= 500) {
           Swal.fire('Error', 'Ocurrió un error del servidor', 'error');
         }
-
       }
     });
   }
@@ -101,7 +106,15 @@ export class ProfileFormComponent implements OnInit {
   submit(): void {
 
     if (this.form.invalid) {
+
       this.form.markAllAsTouched();
+
+      Swal.fire({
+        icon: 'warning',
+        title: 'Formulario incompleto',
+        text: 'No se puede actualizar. Complete los campos obligatorios.'
+      });
+
       return;
     }
 
@@ -121,8 +134,7 @@ export class ProfileFormComponent implements OnInit {
 
         this.saving = false;
 
-        // refresca /me
-        this.authState.loadUser().subscribe();
+        this.authState.loadUser(true).subscribe();
 
         Swal.fire({
           icon: 'success',
@@ -134,10 +146,70 @@ export class ProfileFormComponent implements OnInit {
         this.saved.emit();
       },
       error: () => {
+
         this.saving = false;
-        Swal.fire('Error', 'No se pudo guardar el perfil', 'error');
+
+        Swal.fire(
+          'Error',
+          'No se pudo guardar el perfil',
+          'error'
+        );
       }
     });
+  }
+
+  verifyDni(): void {
+
+    const typeId = this.form.controls.identityDocumentTypeId.value;
+    const dni = this.form.controls.identityDocumentNumber.value;
+
+    if (!typeId || !dni) return;
+
+    if (dni.length !== 8) {
+      Swal.fire('DNI inválido', 'Debe tener 8 dígitos', 'warning');
+      return;
+    }
+
+    this.dniLoading = true;
+
+    this.profileApi.consultDni(dni).subscribe({
+      next: (res) => {
+
+        this.dniLoading = false;
+
+        if (res?.nombre_completo) {
+
+          const formattedName = this.toTitleCase(res.nombre_completo);
+
+          this.form.patchValue({
+            fullName: formattedName
+          });
+
+        }
+
+      },
+      error: () => {
+
+        this.dniLoading = false;
+
+        Swal.fire(
+          'Error',
+          'No se pudo consultar el DNI',
+          'error'
+        );
+      }
+    });
+  }
+
+  private toTitleCase(text: string): string {
+
+    return text
+      .toLowerCase()
+      .split(' ')
+      .map(word =>
+        word.charAt(0).toUpperCase() + word.slice(1)
+      )
+      .join(' ');
   }
 
   uploadPhoto(event: Event): void {
@@ -164,7 +236,6 @@ export class ProfileFormComponent implements OnInit {
 
           this.profileImageUrl = imageUrl;
 
-          // sincroniza header
           this.authState.updateProfileImage(imageUrl);
         });
       }
@@ -175,15 +246,15 @@ export class ProfileFormComponent implements OnInit {
 
     let completed = 0;
 
-    if (this.profileImageUrl) completed += 25;
-    if (this.form?.controls.fullName?.value?.trim()) completed += 25;
-    if (this.form?.controls.phone?.value?.trim()) completed += 25;
+    if (this.form?.controls.fullName?.value?.trim()) completed += 40;
+
+    if (this.form?.controls.phone?.value?.trim()) completed += 40;
 
     if (
       this.form?.controls.identityDocumentTypeId?.value &&
       this.form?.controls.identityDocumentNumber?.value?.trim()
     ) {
-      completed += 25;
+      completed += 20;
     }
 
     return completed;
@@ -193,7 +264,7 @@ export class ProfileFormComponent implements OnInit {
 
     const p = this.profileProgress;
 
-    if (p === 100) return 'Perfil completo';
+    if (p === 100) return 'Perfil listo para comprar';
     if (p >= 75) return 'Casi listo';
     if (p >= 50) return 'A medio camino';
     if (p >= 25) return 'Empezando';

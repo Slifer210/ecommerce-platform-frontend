@@ -5,15 +5,13 @@
             space-y-6"
     >
 
-    <!-- DIVISOR -->
-    <div *ngIf="catalogState.hasActiveFilters()" class="border-t border-gray-200"></div>
-
     <!-- CATEGORÍAS -->
     <section class="space-y-3">
         <app-catalog-categories
         [rootCategories]="rootCategories"
         [categoryTree]="categoryTree"
         [facetCount]="facetCount"
+        [activeCategoryId]="activeCategoryId"
         (categorySelect)="categorySelect.emit($event)"
         ></app-catalog-categories>
     </section>

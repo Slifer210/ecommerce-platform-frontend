@@ -150,4 +150,20 @@ export class ProductDetailComponent implements OnInit {
       queryParams: { category: categoryId }
     });
   }
+
+
+  getWhatsAppLink(product: CatalogProduct): string {
+
+    const phone = "51916337058";
+
+    const message =
+    `Hola, estoy interesado en este producto:
+
+    ${product.name}
+    Precio: S/ ${product.price}
+
+    ¿Podría darme más información?`;
+
+      return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+  }
 }

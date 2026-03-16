@@ -10,10 +10,8 @@ import { AttributeFacet } from '../../models/catalog-facets.response';
 })
 export class CatalogFacetsComponent {
 
-  // 👉 SOLO ATRIBUTOS
   @Input() facetAttributes: AttributeFacet[] = [];
 
-  // 👉 ESTADO REAL (para marcar/desmarcar)
   @Input() selectedAttributes = new Map<string, string[]>();
 
   @Output() attributeToggle =

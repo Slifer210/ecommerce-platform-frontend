@@ -1,97 +1,122 @@
-<div class="review-form bg-gray-50 border rounded-lg p-4 space-y-3 max-w-md">
-
-  <h4 class="text-sm font-semibold text-gray-700">
-    Tu opinión
-  </h4>
+<div class="mt-4 space-y-4 max-w-md">
 
   <!-- STARS -->
-  <div class="flex items-center gap-1">
-    <ng-container *ngFor="let star of [1,2,3,4,5]">
-      <label class="cursor-pointer">
-        <input
-          type="radio"
-          name="rating"
-          [value]="star"
-          [(ngModel)]="rating"
-          class="hidden"
-        />
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="currentColor"
-          viewBox="0 0 24 24"
-          class="w-6 h-6 transition-colors"
-          [class.text-yellow-400]="rating >= star"
-          [class.text-gray-300]="rating < star"
-        >
-          <path
-            d="M12 .587l3.668 7.431 8.2 1.192-5.934 5.786 
-               1.402 8.174L12 18.897l-7.336 3.873 
-               1.402-8.174L.132 9.21l8.2-1.192z"
+  <div class="flex items-center gap-2">
+
+    <span class="text-sm text-gray-600">
+      Calificación
+    </span>
+
+    <div class="flex gap-1">
+
+      <ng-container *ngFor="let star of [1,2,3,4,5]">
+
+        <label class="cursor-pointer">
+
+          <input
+            type="radio"
+            name="rating"
+            [value]="star"
+            [(ngModel)]="rating"
+            class="hidden"
           />
-        </svg>
-      </label>
-    </ng-container>
+
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            class="w-5 h-5 transition"
+            [class.text-yellow-400]="rating >= star"
+            [class.text-gray-300]="rating < star"
+          >
+            <path d="M12 .587l3.668 7.431 8.2 1.192-5.934 5.786 
+                     1.402 8.174L12 18.897l-7.336 3.873 
+                     1.402-8.174L.132 9.21l8.2-1.192z"/>
+          </svg>
+
+        </label>
+
+      </ng-container>
+
+    </div>
+
   </div>
 
   <!-- COMMENT -->
   <textarea
     [(ngModel)]="comment"
     rows="3"
-    class="w-full text-sm border rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-    placeholder="¿Qué te pareció el producto?"
+    placeholder="Comparte tu experiencia con este producto"
+    class="w-full text-sm border border-gray-200 rounded-lg p-3
+           focus:ring-2 focus:ring-blue-500 focus:border-transparent
+           resize-none"
   ></textarea>
 
-  <!-- IMAGES -->
-  <div class="space-y-2">
-    <label class="text-xs text-gray-600 font-medium">
-      Agregar fotos (máx. 3)
+  <!-- IMAGE UPLOAD -->
+  <div class="flex items-center gap-3 text-sm">
+
+    <label class="cursor-pointer text-blue-600 hover:underline">
+
+      Agregar fotos
+
+      <input
+        type="file"
+        accept="image/*"
+        (change)="uploadImage($event)"
+        [disabled]="images.length >= 3 || uploading"
+        class="hidden"
+      />
+
     </label>
 
-    <input
-      type="file"
-      accept="image/*"
-      (change)="uploadImage($event)"
-      [disabled]="images.length >= 3 || uploading"
-      class="block text-sm"
-    />
+    <span class="text-gray-400 text-xs">
+      (máx. 3)
+    </span>
 
-    <div *ngIf="uploading" class="text-xs text-gray-500">
-      Subiendo imagen...
-    </div>
+  </div>
 
-    <!-- PREVIEW -->
-    <div class="flex gap-2 flex-wrap">
-      <div
-        *ngFor="let img of images; let i = index"
-        class="relative w-20 h-20 border rounded"
+  <!-- PREVIEW -->
+  <div class="flex gap-2">
+
+    <div
+      *ngFor="let img of images; let i = index"
+      class="relative w-16 h-16 rounded-md overflow-hidden border border-gray-200"
+    >
+
+      <img
+        [src]="img"
+        class="w-full h-full object-cover"
+      />
+
+      <button
+        type="button"
+        class="absolute top-0 right-0 bg-black/70 text-white
+               text-xs px-1 rounded-bl"
+        (click)="removeImage(i)"
       >
-        <img
-          [src]="img"
-          class="w-full h-full object-cover rounded"
-        />
+        ×
+      </button>
 
-        <button
-          type="button"
-          class="absolute -top-2 -right-2 bg-red-600 text-white
-                 text-xs w-5 h-5 rounded-full"
-          (click)="removeImage(i)"
-        >
-          ✕
-        </button>
-      </div>
     </div>
+
   </div>
 
   <!-- ACTION -->
-  <div class="flex justify-end">
+  <div class="flex justify-end pt-1">
+
     <button
+      type="button"
       (click)="submit()"
       [disabled]="!rating || !comment || uploading"
-      class="px-4 py-1.5 text-sm rounded-md text-white
-             bg-blue-600 hover:bg-blue-700
-             disabled:bg-gray-300 disabled:cursor-not-allowed">
-      Enviar
+      class="px-4 py-2 text-sm font-medium rounded-lg
+            bg-blue-600 text-white
+            hover:bg-blue-700
+            disabled:bg-gray-300 disabled:cursor-not-allowed
+            transition"
+    >
+      Enviar reseña
     </button>
+
   </div>
 
 </div>

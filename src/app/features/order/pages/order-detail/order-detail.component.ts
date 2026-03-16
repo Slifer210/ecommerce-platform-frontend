@@ -10,11 +10,12 @@ import { CheckoutService } from '../../../cart/services/checkout.service';
 import Swal from 'sweetalert2';
 import { NotificationState } from '../../../notification/state/notification.state';
 import { ReviewFormComponent } from "../../../product-review/components/review-form/review-form.component";
+import { AppModalComponent } from "../../../../shared/components/app-modal/app-modal.component";
 
 @Component({
   standalone: true,
   selector: 'app-order-detail',
-  imports: [CommonModule, ReviewFormComponent],
+  imports: [CommonModule, ReviewFormComponent, AppModalComponent],
   templateUrl: './order-detail.component.html'
 })
 export class OrderDetailComponent implements OnInit, OnDestroy {
@@ -26,12 +27,12 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
   readonly order = signal<OrderDetail | null>(null);
   readonly timeline = signal<OrderTimelineItem[]>([]);
   readonly loading = signal<boolean>(false);
-
+  readonly reviewModalItem = signal<any | null>(null);
   private orderId: string | null = null;
   private pollingId: ReturnType<typeof setInterval> | null = null;
 
   /* =========================
-    FLOW FIJO
+    FLOW DE ESTADOS
   ========================== */
 
   readonly orderFlow: OrderStatus[] = [
@@ -66,6 +67,7 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
+
       const newOrderId = params.get('id');
 
       if (!newOrderId) {
@@ -73,25 +75,19 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
         return;
       }
 
-      // si es la misma orden, no recargar todo
       if (this.orderId === newOrderId) {
         return;
       }
 
-      // cambia de orden (click desde notificaciones)
       this.orderId = newOrderId;
 
-      // limpia polling anterior
       this.clearPolling();
 
-      // limpia estado
       this.order.set(null);
       this.timeline.set([]);
 
-      // carga nueva orden
       this.loadAll(true);
 
-      // inicia polling controlado
       this.startPolling();
     });
   }
@@ -132,16 +128,13 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
         return;
       }
 
-      if (verifying) {
-        return;
-      }
+      if (verifying) return;
 
       verifying = true;
       attempts++;
 
       this.orderService.verifyPayment(this.orderId).subscribe({
         next: () => {
-
           this.loadAll(false);
         },
         error: () => {
@@ -153,7 +146,6 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
       });
 
     }, 5000);
-
   }
 
   private clearPolling(): void {
@@ -168,6 +160,7 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
   ========================== */
 
   private loadAll(showLoader = true): void {
+
     if (!this.orderId) return;
 
     if (showLoader) this.loading.set(true);
@@ -179,11 +172,10 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
           ...item,
           showReviewForm: false
         }));
-        
+
         this.order.set(order);
         this.loading.set(false);
 
-        // si ya no está en PROCESSING → detiene polling
         if (order.status !== 'PROCESSING') {
           this.clearPolling();
         }
@@ -200,12 +192,14 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
   }
 
   /* =========================
-    TIMELINE / UI
+    TIMELINE UI
   ========================== */
 
   isActive(status: OrderStatus): boolean {
+
     const current = this.order()?.status;
     if (!current) return false;
+
     return this.orderFlow.indexOf(status) <= this.orderFlow.indexOf(current);
   }
 
@@ -214,21 +208,38 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
   }
 
   progressPercent(): number {
+
     const current = this.order()?.status;
     if (!current) return 0;
+
     const index = this.orderFlow.indexOf(current);
     return (index / (this.orderFlow.length - 1)) * 100;
   }
 
   statusLabel(status: OrderStatus): string {
+
     switch (status) {
-      case 'PENDING': return 'Pendiente';
-      case 'PROCESSING': return 'En proceso';
-      case 'PAID': return 'Pagado';
-      case 'SHIPPED': return 'Enviado';
-      case 'COMPLETED': return 'Completado';
-      case 'CANCELLED': return 'Cancelado';
-      default: return status;
+
+      case 'PENDING':
+        return 'Pendiente de pago';
+
+      case 'PROCESSING':
+        return 'Confirmando pago...';
+
+      case 'PAID':
+        return 'Pagado';
+
+      case 'SHIPPED':
+        return 'Enviado';
+
+      case 'COMPLETED':
+        return 'Completado';
+
+      case 'CANCELLED':
+        return 'Cancelado';
+
+      default:
+        return status;
     }
   }
 
@@ -237,8 +248,18 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
   ========================== */
 
   continuePayment(): void {
+
     const order = this.order();
     if (!order) return;
+
+    if (order.status !== 'PENDING') {
+      Swal.fire(
+        'Pago no disponible',
+        'Esta orden ya no puede pagarse nuevamente.',
+        'info'
+      );
+      return;
+    }
 
     this.checkoutService
       .getCheckoutByOrder(order.orderId)
@@ -250,38 +271,39 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
   }
 
   completeOrder(): void {
+
     const order = this.order();
     if (!order) return;
 
     this.orderService.completeOrder(order.orderId).subscribe({
       next: () => {
-        // Recarga la orden
+
         this.loadAll();
-        // Actualiza las notificaciones
         this.notificationState.loadDropdown();
       },
-      error: () => 
+      error: () =>
         Swal.fire('Error', 'No se pudo completar la orden', 'error')
     });
   }
 
   shipOrder(): void {
+
     const order = this.order();
     if (!order) return;
 
     this.orderService.shipOrder(order.orderId).subscribe({
       next: () => {
-        // Recarga la orden
+
         this.loadAll();
-        // Actualiza las notificaciones
         this.notificationState.loadDropdown();
       },
-      error: () => 
+      error: () =>
         Swal.fire('Error', 'No se pudo enviar la orden', 'error')
     });
   }
 
   approvePayment(): void {
+
     const order = this.order();
     if (!order) return;
 
@@ -289,15 +311,15 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
       next: () => {
 
         this.loadAll();
-
         this.notificationState.loadDropdown();
       },
-      error: () => 
+      error: () =>
         Swal.fire('Error', 'No se pudo aprobar el pago', 'error')
     });
   }
 
   cancelOrder(): void {
+
     const order = this.order();
     if (!order) return;
 
@@ -309,12 +331,14 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
       confirmButtonColor: '#dc2626',
       confirmButtonText: 'Sí, cancelar'
     }).then(result => {
+
       if (!result.isConfirmed) return;
 
       this.orderService.cancelOrder(order.orderId).subscribe({
         next: () => {
-          this.loadAll();                    
-          this.notificationState.loadDropdown();      
+
+          this.loadAll();
+          this.notificationState.loadDropdown();
         },
         error: () =>
           Swal.fire('Error', 'No se pudo cancelar la orden', 'error')
@@ -324,20 +348,77 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
   }
 
   downloadReceipt(): void {
+
     const order = this.order();
     if (!order) return;
 
     this.orderService.downloadReceipt(order.orderId).subscribe(blob => {
+
       const url = URL.createObjectURL(blob);
+
       const a = document.createElement('a');
       a.href = url;
       a.download = `receipt-${order.orderId}.pdf`;
       a.click();
+
       URL.revokeObjectURL(url);
     });
   }
 
+  goToProduct(productId: string): void {
+    this.router.navigate(['/products', productId]);
+  }
+
   goBack(): void {
     this.router.navigate(['/my-orders']);
+  }
+
+  openReview(item:any){
+    this.reviewModalItem.set(item);
+  }
+
+  closeReview(){
+    this.reviewModalItem.set(null);
+  }
+
+
+  onReviewCreated(item: any, review: any): void {
+
+    if (!review) {
+      console.warn("Review payload vacío");
+      return;
+    }
+
+    const order = this.order();
+    if (!order) return;
+
+    const updatedItems = order.items.map(i => {
+
+      if (i.id === item.id) {
+
+        return {
+          ...i,
+          reviewed: true,
+          review: {
+            rating: review.rating,
+            comment: review.comment,
+            imageUrls: review.imageUrls ?? []
+          }
+        };
+
+      }
+
+      return i;
+
+    });
+
+    this.order.set({
+      ...order,
+      items: updatedItems
+    });
+
+    // cerrar modal
+    this.reviewModalItem.set(null);
+
   }
 }

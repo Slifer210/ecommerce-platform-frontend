@@ -2,9 +2,7 @@ import {
   Component,
   OnInit,
   signal,
-  computed,
-  ViewChild,
-  ElementRef
+  computed
 } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
@@ -28,7 +26,11 @@ import { CartState } from '../../../cart/cart.state';
 import { CatalogState } from '../../models/catalog.state';
 
 import { CatalogSidebarComponent } from '../../components/catalog-sidebar/catalog-sidebar.component';
-
+import { ProductCardComponent } from '../../../../shared/components/product-card/product-card.component';
+import { ProductSliderSectionComponent } from "../../../../shared/components/product-slider-section/product-slider-section.component";
+import { BreadcrumbComponent } from '../../../../shared/components/breadcrumb/breadcrumb.component';
+import { PaginationComponent } from "../../../../shared/components/pagination/pagination.component";
+import { CatalogControlsComponent } from "../../../../shared/components/catalog-controls/catalog-controls.component";
 type SortKey =
   | 'relevance'
   | 'newest'
@@ -39,7 +41,7 @@ type SortKey =
 @Component({
   selector: 'app-catalog',
   standalone: true,
-  imports: [CommonModule, CatalogSidebarComponent, RouterModule],
+  imports: [CommonModule, CatalogSidebarComponent, RouterModule, ProductCardComponent, ProductSliderSectionComponent, BreadcrumbComponent, PaginationComponent, CatalogControlsComponent],
   templateUrl: './catalog.component.html'
 })
 export class CatalogComponent implements OnInit {
@@ -47,9 +49,8 @@ export class CatalogComponent implements OnInit {
   // ===============================
   // referencia slider trending
   // ===============================
-  @ViewChild('trendingContainer')
-  trendingContainer!: ElementRef<HTMLDivElement>;
 
+  readonly detectedCategoryId = signal<string | null>(null);
   // ===== Grid (explorar) =====
   readonly products = signal<CatalogProduct[]>([]);
   readonly loading = signal(false);
@@ -68,10 +69,15 @@ export class CatalogComponent implements OnInit {
   readonly appliedMinPrice = signal<number | null>(null);
   readonly appliedMaxPrice = signal<number | null>(null);
 
-  // ===== Home (hero / quick / trending) =====
+  // ===== Home (hero / quick / sections) =====
   readonly hero = signal<{ title: string; subtitle: string } | null>(null);
+
   readonly quickCategories = signal<Category[]>([]);
+
   readonly trending = signal<CatalogProduct[]>([]);
+  readonly bestSellers = signal<CatalogProduct[]>([]);
+  readonly newProducts = signal<CatalogProduct[]>([]);
+  readonly topRated = signal<CatalogProduct[]>([]);
 
   // ===== Paginación / ordenamiento =====
   readonly currentPage = signal(0);
@@ -90,25 +96,97 @@ export class CatalogComponent implements OnInit {
 
   // ===== Computeds =====
   readonly categoryTree = computed(() => {
-    const source = this.catalogState.hasActiveFilters()
-      ? this.mapFacetsToCategories()
-      : this.allCategories();
 
-    const map = new Map<string | null, Category[]>();
-    for (const c of source) {
-      const key = c.parentId ?? null;
-      if (!map.has(key)) map.set(key, []);
-      map.get(key)!.push(c);
+    const search = this.catalogState.searchApplied();
+    const filters = this.catalogState.hasActiveFilters();
+
+    const selectedCategory =
+      this.appliedCategoryId() ??
+      this.detectedCategoryId();
+
+    let source: Category[];
+
+    // ===============================
+    // SEARCH / FACETS MODE
+    // ===============================
+    if (search || filters) {
+
+      source = this.mapFacetsToCategories();
+
+    } else {
+
+      source = this.allCategories();
+
     }
-    return map;
+
+    // ===============================
+    // CATEGORY FILTER (IMPORTANT)
+    // ===============================
+    if (selectedCategory) {
+
+      const byId = new Map(source.map(c => [c.id, c]));
+      const allowed = new Set<string>();
+
+      // selected
+      allowed.add(selectedCategory);
+
+      // parent
+      const parentId = byId.get(selectedCategory)?.parentId;
+
+      if (parentId) {
+
+        allowed.add(parentId);
+
+        // siblings
+        source
+          .filter(c => c.parentId === parentId)
+          .forEach(c => allowed.add(c.id));
+
+      }
+
+      // children
+      source
+        .filter(c => c.parentId === selectedCategory)
+        .forEach(c => allowed.add(c.id));
+
+      source = source.filter(c => allowed.has(c.id));
+
+    }
+
+    // ===============================
+    // BUILD TREE
+    // ===============================
+    const tree = new Map<string | null, Category[]>();
+
+    for (const c of source) {
+
+      const key = c.parentId ?? null;
+
+      if (!tree.has(key)) {
+        tree.set(key, []);
+      }
+
+      tree.get(key)!.push(c);
+
+    }
+
+    return tree;
+
   });
 
   readonly rootCategories = computed(() =>
     this.categoryTree().get(null) ?? []
   );
 
-  readonly breadcrumb = computed<Category[]>(() => {
-    const categoryId = this.appliedCategoryId();
+  readonly breadcrumb = computed(() => {
+
+    const categoryId =
+      this.appliedCategoryId() ??
+      this.detectedCategoryId();
+
+    console.log("detectedCategoryId:", this.detectedCategoryId());
+    console.log("appliedCategoryId:", this.appliedCategoryId());
+    console.log("categories loaded:", this.allCategories().length);
     if (!categoryId) return [];
 
     const categories = this.allCategories();
@@ -119,12 +197,15 @@ export class CatalogComponent implements OnInit {
 
     while (current) {
       path.unshift(current);
+
       const parentId = current.parentId;
       if (!parentId) break;
+
       current = categories.find(c => c.id === parentId);
     }
 
     return path;
+
   });
 
   readonly showingFrom = computed(() => {
@@ -239,22 +320,6 @@ export class CatalogComponent implements OnInit {
     });
   }
 
-
-  // ===============================
-  // slider trending
-  // ===============================
-  scrollTrending(direction: 'left' | 'right'): void {
-    const container = this.trendingContainer?.nativeElement;
-    if (!container) return;
-
-    const scrollAmount = 320;
-
-    container.scrollBy({
-      left: direction === 'right' ? scrollAmount : -scrollAmount,
-      behavior: 'smooth'
-    });
-  }
-
   // ===============================
   // HOME
   // ===============================
@@ -264,15 +329,30 @@ export class CatalogComponent implements OnInit {
         this.hero.set(res?.hero ?? null);
         this.quickCategories.set(res?.quickCategories ?? []);
         this.trending.set(res?.trending ?? []);
+        this.bestSellers.set(res?.bestSellers ?? []);
+        this.newProducts.set(res?.newProducts ?? []);
+        this.topRated.set(res?.topRated ?? []);
       },
       error: () => {
         this.hero.set(null);
         this.quickCategories.set([]);
         this.trending.set([]);
+        this.bestSellers.set([]);
+        this.newProducts.set([]);
+        this.topRated.set([]);
       }
     });
   }
+  scrollSlider(container: HTMLElement, direction: 'left' | 'right') {
 
+    const scrollAmount = 320;
+
+    container.scrollBy({
+      left: direction === 'right' ? scrollAmount : -scrollAmount,
+      behavior: 'smooth'
+    });
+
+  }
   // ===============================
   // FILTER EVENTS
   // ===============================
@@ -360,7 +440,15 @@ export class CatalogComponent implements OnInit {
       sort: this.sortKey(),
     }).subscribe({
       next: (res: any) => {
+
         this.products.set(res?.page?.content ?? []);
+        const ctx = res?.searchContext;
+          console.log("searchContext:", ctx);
+          if (ctx?.dominantCategoryId) {
+            this.detectedCategoryId.set(ctx.dominantCategoryId);
+          } else {
+            this.detectedCategoryId.set(null);
+        }
 
         this.facetCategories.set(res?.facets?.categories ?? []);
         this.facetAttributes.set(res?.facets?.attributes ?? []);
@@ -440,12 +528,39 @@ export class CatalogComponent implements OnInit {
   }
 
   private mapFacetsToCategories(): Category[] {
-    return this.facetCategories().map(f => ({
-      id: f.id,
-      name: f.name,
-      parentId: null
-    }));
+
+  const all = this.allCategories();
+  const facets = this.facetCategories();
+
+  const byId = new Map(all.map(c => [c.id, c]));
+  const collected = new Map<string, Category>();
+
+  for (const facet of facets) {
+
+    let current = byId.get(facet.id);
+
+    while (current) {
+
+      if (!collected.has(current.id)) {
+
+        collected.set(current.id, {
+          id: current.id,
+          name: current.name,
+          parentId: current.parentId
+        });
+
+      }
+
+      current = current.parentId
+        ? byId.get(current.parentId)
+        : undefined;
+
+    }
+
   }
+
+  return Array.from(collected.values());
+}
 
   isExploreMode(): boolean {
     return this.exploreMode();
@@ -459,16 +574,10 @@ export class CatalogComponent implements OnInit {
     this.catalogState.clearCategory();
   }
 
-  goToProduct(id: string): void {
-
-  console.log('CATEGORY ACTUAL:', this.appliedCategoryId());
-
-  this.navigationContext.setCategory(this.appliedCategoryId());
-
-  console.log('GUARDADO EN CONTEXT:', this.navigationContext.getCategory());
-
-  this.router.navigate(['/products', id]);
-}
+  goToProduct(product: CatalogProduct): void {
+    this.navigationContext.setCategory(this.appliedCategoryId());
+    this.router.navigate(['/products', product.id]);
+  }
 
   goToExploreMode(): void {
 
@@ -488,11 +597,11 @@ export class CatalogComponent implements OnInit {
   }
 
 
-  addToCart(productId: string): void {
+  addToCart(product: CatalogProduct): void {
     if (!this.authState.isAuthenticated()) {
       Swal.fire({ icon: 'info', title: 'Inicia sesión' });
       return;
     }
-    this.cartState.addItem(productId);
+    this.cartState.addItem(product.id);
   }
 }

@@ -1,6 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+
 import { OrderService } from '../../services/order.service';
 import { OrderSummary, OrderStatus } from '../../models/order-summary.model';
 import { NotificationState } from '../../../notification/state/notification.state';
@@ -24,53 +25,116 @@ export class MyOrdersComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+
     this.notificationState.loadDropdown();
     this.loadOrders();
+
   }
 
+  /* =============================
+     CARGAR ÓRDENES
+  ============================= */
+
   private loadOrders(): void {
+
     this.loading.set(true);
 
     this.orderService.getMyOrders().subscribe({
+
       next: orders => {
-        this.orders.set(orders);
+
+        const filtered = orders.filter(o => o.itemsCount > 0);
+
+        this.orders.set(filtered);
         this.loading.set(false);
+
       },
+
       error: () => {
+
         this.orders.set([]);
         this.loading.set(false);
+
       }
+
     });
+
   }
+
+  /* =============================
+     DETALLE
+  ============================= */
 
   goToOrderDetail(orderId: string): void {
+
     this.router.navigate(['/my-orders', orderId]);
+
   }
 
-  continuePayment(url: string): void {
-    if (!url) return;
-    window.location.href = url;
-  }
+  /* =============================
+     LABEL DEL ESTADO
+  ============================= */
 
   statusLabel(status: OrderStatus): string {
+
     switch (status) {
-      case 'PAID':
-        return 'Pagado';
+
+      case 'PENDING':
+        return 'Pago pendiente';
 
       case 'PROCESSING':
-        return 'Pago pendiente';
+        return 'Confirmando pago';
+
+      case 'PAID':
+        return 'Pagado';
 
       case 'SHIPPED':
         return 'Enviado';
 
       case 'COMPLETED':
-        return 'Completado';
+        return 'Entregado';
 
       case 'CANCELLED':
         return 'Cancelado';
 
       default:
         return status;
+
     }
+
   }
+
+  /* =============================
+     COLOR DEL ESTADO
+  ============================= */
+
+  statusClass(status: OrderStatus): string {
+
+    switch (status) {
+
+      case 'PENDING':
+        return 'text-yellow-600';
+
+      case 'PROCESSING':
+        return 'text-blue-600';
+
+      case 'PAID':
+        return 'text-green-600';
+
+      case 'SHIPPED':
+        return 'text-blue-700';
+
+      case 'COMPLETED':
+        return 'text-green-700';
+
+      case 'CANCELLED':
+        return 'text-red-600';
+
+      default:
+        return 'text-gray-600';
+
+    }
+
+  }
+
 }

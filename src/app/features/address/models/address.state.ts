@@ -19,9 +19,15 @@ export class AddressState {
     }
 
     summary(): string {
+
         const a = this._default();
+
         if (!a) return 'Sin dirección';
 
-        return `${a.district ?? ''}, ${a.province ?? ''}`;
+        if (a.district && a.province) {
+            return `${a.district}, ${a.province}`;
+        }
+
+        return a.addressLine;
     }
 }

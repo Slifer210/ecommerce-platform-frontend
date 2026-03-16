@@ -122,7 +122,7 @@ export class CatalogComponent implements OnInit {
     // ===============================
     // CATEGORY FILTER (IMPORTANT)
     // ===============================
-    if (selectedCategory) {
+    if (selectedCategory && !search) {
 
       const byId = new Map(source.map(c => [c.id, c]));
       const allowed = new Set<string>();
@@ -414,8 +414,24 @@ export class CatalogComponent implements OnInit {
   }
 
   getFacetCount(categoryId: string): number {
-    const facet = this.facetCategories().find(f => f.id === categoryId);
-    return facet ? facet.count : 0;
+
+    const facets = this.facetCategories();
+    const all = this.allCategories();
+
+    // conteo directo
+    let total = facets.find(f => f.id === categoryId)?.count ?? 0;
+
+    // sumar hijos
+    const children = all.filter(c => c.parentId === categoryId);
+
+    for (const child of children) {
+      const childFacet = facets.find(f => f.id === child.id);
+      if (childFacet) {
+        total += childFacet.count;
+      }
+    }
+
+    return total;
   }
 
   // ===============================
@@ -529,38 +545,47 @@ export class CatalogComponent implements OnInit {
 
   private mapFacetsToCategories(): Category[] {
 
-  const all = this.allCategories();
-  const facets = this.facetCategories();
+    const all = this.allCategories();
+    const facets = this.facetCategories();
 
-  const byId = new Map(all.map(c => [c.id, c]));
-  const collected = new Map<string, Category>();
+    const byId = new Map(all.map(c => [c.id, c]));
+    const collected = new Map<string, Category>();
 
-  for (const facet of facets) {
+    for (const facet of facets) {
 
-    let current = byId.get(facet.id);
+      let current = byId.get(facet.id);
 
-    while (current) {
+      while (current) {
 
-      if (!collected.has(current.id)) {
+        if (!collected.has(current.id)) {
 
-        collected.set(current.id, {
-          id: current.id,
-          name: current.name,
-          parentId: current.parentId
-        });
+          collected.set(current.id, {
+            id: current.id,
+            name: current.name,
+            parentId: current.parentId
+          });
+
+        }
+
+        // agregar hijos también
+        all
+          .filter(c => c.parentId === current!.id)
+          .forEach(child => {
+            if (!collected.has(child.id)) {
+              collected.set(child.id, child);
+            }
+          });
+
+        current = current.parentId
+          ? byId.get(current.parentId)
+          : undefined;
 
       }
 
-      current = current.parentId
-        ? byId.get(current.parentId)
-        : undefined;
-
     }
 
+    return Array.from(collected.values());
   }
-
-  return Array.from(collected.values());
-}
 
   isExploreMode(): boolean {
     return this.exploreMode();

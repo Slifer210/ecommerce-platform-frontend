@@ -27,6 +27,7 @@ export class CatalogSidebarComponent {
   @Input() categoryTree!: Map<string | null, Category[]>;
   @Input() facetCount!: (categoryId: string) => number;
   @Input() activeCategoryId!: string | null;
+  @Input() detectedCategoryId!: string | null;
   /** Facets */
   @Input() facetAttributes!: AttributeFacet[];
   @Input() facetPriceRanges!: PriceRangeFacet[];

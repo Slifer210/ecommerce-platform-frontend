@@ -23,6 +23,9 @@ export class CatalogCategoriesComponent implements OnChanges {
 
   @Input() activeCategoryId!: string | null;
 
+  /** categoría dominante detectada en búsqueda */
+  @Input() detectedCategoryId!: string | null;
+
   /** categorías raíz */
   @Input({ required: true }) rootCategories!: Category[];
 
@@ -42,19 +45,49 @@ export class CatalogCategoriesComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
 
+    // ===============================
+    // EXPAND CATEGORY SELECTION
+    // ===============================
     if (changes['activeCategoryId']) {
 
       const id = this.activeCategoryId;
 
-      if (!id) return;
+      if (id) {
 
-      // expandir categoría seleccionada
-      this.ui.expandCategory(id);
+        this.ui.expandCategory(id);
 
-      // expandir padre si existe
+        for (const [parentId, children] of this.categoryTree.entries()) {
+
+          if (children.some(c => c.id === id)) {
+
+            if (parentId) {
+              this.ui.expandCategory(parentId);
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+
+    // ===============================
+    // AUTO EXPAND IN SEARCH MODE
+    // ===============================
+    if (
+      this.catalogState.isSearchActive() &&
+      !this.activeCategoryId &&
+      this.detectedCategoryId
+    ) {
+
+      const dominant = this.detectedCategoryId;
+
+      this.ui.expandCategory(dominant);
+
       for (const [parentId, children] of this.categoryTree.entries()) {
 
-        if (children.some(c => c.id === id)) {
+        if (children.some(c => c.id === dominant)) {
 
           if (parentId) {
             this.ui.expandCategory(parentId);
@@ -69,8 +102,8 @@ export class CatalogCategoriesComponent implements OnChanges {
   }
 
   selectCategory(id: string | null): void {
-    this.ui.tempCategoryId.set(id);   // UI
-    this.categorySelect.emit(id);     // FILTRO REAL
+    this.ui.tempCategoryId.set(id);
+    this.categorySelect.emit(id);
   }
 
   toggleCategory(id: string): void {

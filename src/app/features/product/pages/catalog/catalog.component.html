@@ -153,11 +153,15 @@
   <!-- ================= MAIN LAYOUT ================= -->
   <section 
     *ngIf="exploreMode() || catalogState.hasActiveFilters() || catalogState.searchApplied()"
-    class="grid grid-cols-1 md:grid-cols-4 gap-12"
+    class="grid grid-cols-1 gap-12"
+    [ngClass]="{
+      'md:grid-cols-4': products().length > 0,
+      'md:grid-cols-1': products().length === 0
+    }"
   >
     <!-- SIDEBAR -->
     <aside
-      *ngIf="catalogState.hasActiveFilters() || catalogState.searchApplied()"
+      *ngIf="(catalogState.hasActiveFilters() || catalogState.searchApplied()) && products().length > 0"
       class="md:col-span-1"
     >
       <div class="sticky top-8 bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
@@ -165,6 +169,7 @@
           [rootCategories]="rootCategories()"
           [categoryTree]="categoryTree()"
           [activeCategoryId]="appliedCategoryId()"
+          [detectedCategoryId]="detectedCategoryId()"
           [facetCount]="getFacetCount.bind(this)"
           [facetAttributes]="facetAttributes()"
           [facetPriceRanges]="facetPriceRanges()"

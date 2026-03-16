@@ -547,6 +547,10 @@ export class CatalogComponent implements OnInit {
 
     const all = this.allCategories();
     const facets = this.facetCategories();
+    
+    if (!facets || facets.length === 0) {
+      return [];
+    }
 
     const byId = new Map(all.map(c => [c.id, c]));
     const collected = new Map<string, Category>();

@@ -20,7 +20,6 @@
 
         <!-- EXPAND -->
         <button
-          *ngIf="!catalogState.isSearchActive()"
           class="text-sm"
           (click)="toggleCategory(c.id)"
         >
@@ -49,7 +48,7 @@
 
       <!-- CHILD -->
       <div
-        *ngIf="!catalogState.isSearchActive() && isExpanded(c.id)"
+        *ngIf="isExpanded(c.id)"
         class="ml-6 mt-1 space-y-1"
       >
         <button

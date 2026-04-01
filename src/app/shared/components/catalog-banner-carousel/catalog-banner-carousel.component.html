@@ -1,0 +1,90 @@
+<section
+  *ngIf="currentBanner as banner"
+  class="relative overflow-hidden rounded-[2rem] border border-slate-200 bg-slate-950 shadow-[0_32px_70px_-40px_rgba(15,23,42,0.85)]"
+>
+  <picture class="absolute inset-0">
+    <source
+      *ngIf="banner.imageUrlMobile"
+      media="(max-width: 768px)"
+      [srcset]="banner.imageUrlMobile"
+    />
+    <img
+      [src]="banner.imageUrl"
+      [alt]="banner.title"
+      class="h-full w-full object-cover"
+    />
+  </picture>
+
+  <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/70 to-slate-900/20"></div>
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.18),transparent_35%)]"></div>
+
+  <div class="relative z-10 grid min-h-[360px] items-end px-6 py-8 sm:min-h-[420px] sm:px-10 sm:py-10 lg:min-h-[460px] lg:px-14">
+    <div class="max-w-2xl space-y-5 text-white">
+      <span class="inline-flex items-center rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.28em] text-white/80">
+        Promocion destacada
+      </span>
+
+      <div class="space-y-3">
+        <h2 class="text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
+          {{ banner.title }}
+        </h2>
+
+        <p *ngIf="banner.subtitle" class="max-w-xl text-sm leading-7 text-white/78 sm:text-base">
+          {{ banner.subtitle }}
+        </p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <button
+          *ngIf="banner.ctaLabel && banner.ctaUrl"
+          type="button"
+          class="inline-flex items-center rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-slate-100"
+          (click)="openCta()"
+        >
+          {{ banner.ctaLabel }}
+        </button>
+
+        <span class="text-sm text-white/60">
+          Banner {{ currentIndex + 1 }} de {{ banners.length }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="hasMultipleBanners" class="absolute inset-x-0 bottom-0 z-10 flex items-center justify-between gap-4 px-6 py-5 sm:px-10">
+    <div class="flex items-center gap-2">
+      <button
+        *ngFor="let item of banners; let i = index"
+        type="button"
+        class="h-2.5 rounded-full transition-all"
+        [ngClass]="i === currentIndex ? 'w-9 bg-white' : 'w-2.5 bg-white/35 hover:bg-white/60'"
+        (click)="goTo(i)"
+        [attr.aria-label]="'Ir al banner ' + (i + 1)"
+      ></button>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <button
+        type="button"
+        class="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white transition hover:bg-black/35"
+        (click)="previous()"
+        aria-label="Banner anterior"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+
+      <button
+        type="button"
+        class="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white transition hover:bg-black/35"
+        (click)="next()"
+        aria-label="Banner siguiente"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+    </div>
+  </div>
+</section>

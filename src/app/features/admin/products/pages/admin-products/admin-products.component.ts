@@ -11,6 +11,7 @@ import { Category } from '../../models/category.model';
 import { AdminProductModalComponent } from '../admin-product-modal/admin-product-modal.component';
 import { AdminProductCategoriesModalComponent } from '../admin-product-categories-modal/admin-product-categories-modal.component';
 import { AlertService } from '../../../../../core/services/alert.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-admin-products',
@@ -205,6 +206,62 @@ export class AdminProductsComponent implements OnInit {
     });
   }
 
+  exportProducts(format: 'csv' | 'xlsx' | 'pdf'): void {
+
+    const filters: any = {};
+
+    if (this.searchTerm?.trim()) {
+      filters.search = this.searchTerm.trim();
+    }
+
+    if (this.selectedCategoryId) {
+      filters.categoryId = this.selectedCategoryId;
+    }
+
+    if (this.filterActive === 'ACTIVE') {
+      filters.active = true;
+    }
+
+    if (this.filterActive === 'INACTIVE') {
+      filters.active = false;
+    }
+
+    this.adminProductService
+      .exportProducts(filters, format)
+      .subscribe({
+
+        next: (blob) => {
+
+          const url = window.URL.createObjectURL(blob);
+
+          const a = document.createElement('a');
+
+          a.href = url;
+
+          a.download = `products-${new Date().toISOString().slice(0,10)}.${format}`;
+
+          document.body.appendChild(a);
+
+          a.click();
+
+          document.body.removeChild(a);
+
+          window.URL.revokeObjectURL(url);
+
+          Swal.fire({
+            icon: 'success',
+            title: 'Descarga iniciada',
+            text: 'El archivo se está descargando.'
+          });
+
+        },
+
+        error: () => {
+          this.alert.error('No se pudo exportar los productos');
+        }
+
+      });
+  }
   // =========================
   // ACTIVAR / DESACTIVAR
   // =========================
@@ -237,5 +294,32 @@ export class AdminProductsComponent implements OnInit {
         }
       });
     });
+  }
+
+  onExportChange(event: Event): void {
+
+    const select = event.target as HTMLSelectElement;
+    const format = select.value as 'csv' | 'xlsx' | 'pdf';
+
+    if (!format) return;
+
+    Swal.fire({
+      title: 'Exportar productos',
+      text: `¿Descargar archivo en formato ${format.toUpperCase()}?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Descargar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#059669'
+    }).then(result => {
+
+      if (!result.isConfirmed) return;
+
+      this.exportProducts(format);
+
+    });
+
+    // reset dropdown
+    select.value = '';
   }
 }

@@ -73,6 +73,16 @@ export const ADMIN_ROUTES: Routes = [
         },
 
         /* ============================
+        * BANNERS
+        * ============================ */
+        {
+            path: 'banners',
+            loadComponent: () =>
+            import('./banners/pages/admin-banners/admin-banners.component')
+                .then(m => m.AdminBannersComponent)
+        },
+
+        /* ============================
         * QUESTIONS (QA)
         * ============================ */
         {

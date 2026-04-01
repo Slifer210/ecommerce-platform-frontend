@@ -6,6 +6,7 @@ import { environment } from '../../../../environments/environment';
 import {
     LoginRequest,
     LoginResponse,
+    PasswordResetRequest,
     RegisterRequest,
     MeResponse,
     VerifyEmailResponse
@@ -56,10 +57,10 @@ export class AuthService {
         );
     }
 
-    requestPasswordReset(email: string) {
+    requestPasswordReset(data: PasswordResetRequest) {
         return this.http.post(
             `/api/auth/password-reset/request`,
-            { email }
+            data
         );
     }
 

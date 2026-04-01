@@ -31,4 +31,14 @@ export class AdminProductService {
     activate(id: string): Observable<void> {
         return this.http.patch<void>(`${this.API}/${id}/activate`, {});
     }
+
+    exportProducts(filters: any = {}, format: 'csv' | 'xlsx' | 'pdf' = 'csv') {
+
+        const params: any = { ...filters, format };
+
+        return this.http.get(`${this.API}/export`, {
+            params,
+            responseType: 'blob'
+        });
+    }
 }

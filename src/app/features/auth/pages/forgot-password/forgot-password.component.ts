@@ -7,9 +7,11 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 
 import { AuthLayoutComponent } from '../../../../layout/auth-layout/auth-layout.component';
 import { AuthService } from '../../services/auth.service';
+import { RecaptchaV3Service } from '../../../../core/services/recaptcha-v3.service';
 
 @Component({
   standalone: true,
@@ -28,33 +30,46 @@ export class ForgotPasswordComponent {
   form: FormGroup;
   loading = false;
   success = false;
+  errorMessage: string | null = null;
 
   constructor(
     private fb: FormBuilder,
-    private authService: AuthService
+    private authService: AuthService,
+    private recaptchaService: RecaptchaV3Service
   ) {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]]
     });
   }
 
-  submit(): void {
+  async submit(): Promise<void> {
     if (this.form.invalid || this.loading) return;
 
     this.loading = true;
+    this.errorMessage = null;
 
-    this.authService
-      .requestPasswordReset(this.form.value.email)
-      .subscribe({
-        next: () => {
-          this.success = true;
-          this.loading = false;
-        },
-        error: () => {
-          // Seguridad: siempre mostrar éxito
-          this.success = true;
-          this.loading = false;
-        }
-      });
+    try {
+      const captchaToken = await this.recaptchaService.execute('password_reset_request');
+
+      await firstValueFrom(
+        this.authService.requestPasswordReset({
+          email: this.form.getRawValue().email,
+          captchaToken
+        })
+      );
+
+      this.success = true;
+    } catch (error) {
+      const isHttpError = typeof error === 'object' && error !== null && 'status' in error;
+
+      if (isHttpError) {
+        // Seguridad: siempre mostrar exito si el backend rechazo la solicitud.
+        this.success = true;
+      } else {
+        this.errorMessage = 'No se pudo validar el captcha. Intenta de nuevo.';
+      }
+    } finally {
+      this.loading = false;
+    }
   }
 }

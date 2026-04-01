@@ -1,0 +1,432 @@
+<section class="space-y-6">
+  <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Banners</h1>
+      <p class="mt-1 text-sm text-gray-600">
+        Gestiona los banners promocionales del home y su orden de aparicion.
+      </p>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <span class="rounded-full bg-white px-3 py-2 text-sm text-gray-600 shadow-sm ring-1 ring-gray-200">
+        {{ banners.length }} banner(s)
+      </span>
+
+      <button
+        type="button"
+        class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700"
+        (click)="resetForm()"
+      >
+        Nuevo banner
+      </button>
+    </div>
+  </div>
+
+  <div class="grid gap-6 xl:grid-cols-[1.1fr_1.6fr]">
+    <section class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+      <div class="mb-5 flex items-start justify-between gap-3">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-900">
+            {{ isEditing ? 'Editar banner' : 'Crear banner' }}
+          </h2>
+          <p class="mt-1 text-sm text-gray-500">
+            Sube la imagen principal y configura el CTA, orden y vigencia.
+          </p>
+        </div>
+
+        <button
+          *ngIf="isEditing"
+          type="button"
+          class="text-sm text-gray-500 transition hover:text-gray-900"
+          (click)="resetForm()"
+        >
+          Cancelar
+        </button>
+      </div>
+
+      <div class="grid gap-4">
+        <div>
+          <label class="mb-1 block text-sm font-medium text-gray-700">Titulo</label>
+          <input
+            type="text"
+            [(ngModel)]="form.title"
+            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+            placeholder="Ej: Cyber Week"
+          />
+        </div>
+
+        <div>
+          <label class="mb-1 block text-sm font-medium text-gray-700">Subtitulo</label>
+          <textarea
+            [(ngModel)]="form.subtitle"
+            rows="3"
+            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+            placeholder="Mensaje secundario del banner"
+          ></textarea>
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-2">
+          <div class="space-y-3 rounded-xl border border-dashed border-gray-300 p-4">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <h3 class="text-sm font-semibold text-gray-900">Imagen principal</h3>
+                <p class="text-xs text-gray-500">Desktop o imagen base del banner.</p>
+              </div>
+
+              <label class="cursor-pointer rounded-lg bg-gray-900 px-3 py-2 text-xs font-medium text-white transition hover:bg-black">
+                Subir
+                <input
+                  type="file"
+                  accept="image/*"
+                  class="hidden"
+                  (change)="uploadImage($event, 'desktop')"
+                />
+              </label>
+            </div>
+
+            <div *ngIf="uploadingDesktop" class="text-xs text-gray-500">
+              Subiendo imagen principal...
+            </div>
+
+            <div *ngIf="form.imageUrl; else emptyDesktopImage" class="space-y-2">
+              <img
+                [src]="form.imageUrl"
+                alt="Preview banner desktop"
+                class="h-40 w-full rounded-xl object-cover"
+              />
+              <div class="flex items-center gap-2">
+                <input
+                  type="text"
+                  [(ngModel)]="form.imageUrl"
+                  class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                />
+                <button
+                  type="button"
+                  class="rounded-lg border border-red-200 px-3 py-2 text-xs text-red-600 transition hover:bg-red-50"
+                  (click)="removeImage('desktop')"
+                >
+                  Quitar
+                </button>
+              </div>
+            </div>
+
+            <ng-template #emptyDesktopImage>
+              <div class="rounded-xl bg-gray-50 px-4 py-8 text-center text-xs text-gray-400">
+                Aun no hay imagen principal.
+              </div>
+            </ng-template>
+          </div>
+
+          <div class="space-y-3 rounded-xl border border-dashed border-gray-300 p-4">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <h3 class="text-sm font-semibold text-gray-900">Imagen mobile</h3>
+                <p class="text-xs text-gray-500">Opcional para pantallas pequenas.</p>
+              </div>
+
+              <label class="cursor-pointer rounded-lg bg-gray-200 px-3 py-2 text-xs font-medium text-gray-700 transition hover:bg-gray-300">
+                Subir
+                <input
+                  type="file"
+                  accept="image/*"
+                  class="hidden"
+                  (change)="uploadImage($event, 'mobile')"
+                />
+              </label>
+            </div>
+
+            <div *ngIf="uploadingMobile" class="text-xs text-gray-500">
+              Subiendo imagen mobile...
+            </div>
+
+            <div *ngIf="form.imageUrlMobile; else emptyMobileImage" class="space-y-2">
+              <img
+                [src]="form.imageUrlMobile"
+                alt="Preview banner mobile"
+                class="h-40 w-full rounded-xl object-cover"
+              />
+              <div class="flex items-center gap-2">
+                <input
+                  type="text"
+                  [(ngModel)]="form.imageUrlMobile"
+                  class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                />
+                <button
+                  type="button"
+                  class="rounded-lg border border-red-200 px-3 py-2 text-xs text-red-600 transition hover:bg-red-50"
+                  (click)="removeImage('mobile')"
+                >
+                  Quitar
+                </button>
+              </div>
+            </div>
+
+            <ng-template #emptyMobileImage>
+              <div class="rounded-xl bg-gray-50 px-4 py-8 text-center text-xs text-gray-400">
+                Usa la imagen principal si no necesitas una version mobile.
+              </div>
+            </ng-template>
+          </div>
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-2">
+          <div>
+            <label class="mb-1 block text-sm font-medium text-gray-700">CTA label</label>
+            <input
+              type="text"
+              [(ngModel)]="form.ctaLabel"
+              class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              placeholder="Ej: Comprar ahora"
+            />
+          </div>
+
+          <div>
+            <label class="mb-1 block text-sm font-medium text-gray-700">CTA URL</label>
+            <input
+              type="text"
+              [(ngModel)]="form.ctaUrl"
+              class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              placeholder="/products?category=..."
+            />
+          </div>
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-3">
+          <div>
+            <label class="mb-1 block text-sm font-medium text-gray-700">Orden</label>
+            <input
+              type="number"
+              min="0"
+              [(ngModel)]="form.displayOrder"
+              class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+            />
+          </div>
+
+          <div>
+            <label class="mb-1 block text-sm font-medium text-gray-700">Inicio</label>
+            <input
+              type="datetime-local"
+              [(ngModel)]="form.startAt"
+              class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+            />
+          </div>
+
+          <div>
+            <label class="mb-1 block text-sm font-medium text-gray-700">Fin</label>
+            <input
+              type="datetime-local"
+              [(ngModel)]="form.endAt"
+              class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+            />
+          </div>
+        </div>
+
+        <label class="inline-flex items-center gap-3 rounded-xl bg-gray-50 px-4 py-3 text-sm text-gray-700">
+          <input
+            type="checkbox"
+            [(ngModel)]="form.isActive"
+            class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+          />
+          Banner activo
+        </label>
+
+        <div class="rounded-2xl border border-gray-200 bg-gray-50 p-4">
+          <div class="mb-3 flex items-center justify-between gap-3">
+            <h3 class="text-sm font-semibold text-gray-900">Vista previa rapida</h3>
+            <span class="rounded-full bg-white px-3 py-1 text-xs text-gray-500 ring-1 ring-gray-200">
+              {{ form.isActive ? 'Activo' : 'Inactivo' }}
+            </span>
+          </div>
+
+          <div class="overflow-hidden rounded-2xl bg-slate-900">
+            <div class="relative min-h-[220px]">
+              <img
+                *ngIf="form.imageUrl; else emptyPreview"
+                [src]="form.imageUrl"
+                alt="Preview"
+                class="absolute inset-0 h-full w-full object-cover opacity-70"
+              />
+
+              <ng-template #emptyPreview>
+                <div class="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700"></div>
+              </ng-template>
+
+              <div class="relative z-10 flex min-h-[220px] flex-col justify-end gap-3 p-6 text-white">
+                <span class="w-fit rounded-full bg-white/15 px-3 py-1 text-xs uppercase tracking-[0.24em]">
+                  Banner
+                </span>
+                <h4 class="max-w-xl text-2xl font-semibold tracking-tight">
+                  {{ form.title || 'Titulo del banner' }}
+                </h4>
+                <p class="max-w-xl text-sm text-white/80">
+                  {{ form.subtitle || 'Agrega un mensaje corto para acompañar la imagen y el CTA.' }}
+                </p>
+                <a
+                  *ngIf="form.ctaLabel"
+                  href="javascript:void(0)"
+                  class="inline-flex w-fit items-center rounded-full bg-white px-4 py-2 text-sm font-medium text-slate-900"
+                >
+                  {{ form.ctaLabel }}
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-2">
+          <button
+            type="button"
+            class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+            (click)="resetForm()"
+          >
+            Limpiar
+          </button>
+
+          <button
+            type="button"
+            class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+            [disabled]="saving || uploadingDesktop || uploadingMobile"
+            (click)="submit()"
+          >
+            {{ saving ? 'Guardando...' : (isEditing ? 'Actualizar banner' : 'Crear banner') }}
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+      <div class="mb-5 flex items-start justify-between gap-3">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-900">Listado</h2>
+          <p class="mt-1 text-sm text-gray-500">
+            Usa las flechas para reordenar lo que vera el cliente.
+          </p>
+        </div>
+
+        <span
+          *ngIf="reordering"
+          class="rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700"
+        >
+          Reordenando...
+        </span>
+      </div>
+
+      <div *ngIf="loading" class="rounded-xl bg-gray-50 px-4 py-10 text-center text-sm text-gray-500">
+        Cargando banners...
+      </div>
+
+      <div *ngIf="!loading && banners.length === 0" class="rounded-xl bg-gray-50 px-4 py-10 text-center text-sm text-gray-500">
+        Aun no hay banners registrados.
+      </div>
+
+      <div *ngIf="!loading && banners.length > 0" class="space-y-4">
+        <article
+          *ngFor="let banner of banners; let i = index; trackBy: trackByBannerId"
+          class="grid gap-4 rounded-2xl border border-gray-200 p-4 lg:grid-cols-[180px_1fr_auto]"
+        >
+          <div class="overflow-hidden rounded-xl bg-gray-100">
+            <img
+              [src]="banner.imageUrl"
+              [alt]="banner.title"
+              class="h-full min-h-[120px] w-full object-cover"
+            />
+          </div>
+
+          <div class="space-y-3">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600">
+                Orden {{ banner.displayOrder }}
+              </span>
+              <span
+                class="rounded-full px-3 py-1 text-xs font-medium"
+                [ngClass]="banner.isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'"
+              >
+                {{ banner.isActive ? 'Activo' : 'Inactivo' }}
+              </span>
+              <span
+                class="rounded-full px-3 py-1 text-xs font-medium"
+                [ngClass]="banner.currentlyVisible ? 'bg-indigo-50 text-indigo-700' : 'bg-gray-100 text-gray-600'"
+              >
+                {{ banner.currentlyVisible ? 'Visible ahora' : 'No visible ahora' }}
+              </span>
+            </div>
+
+            <div>
+              <h3 class="text-base font-semibold text-gray-900">{{ banner.title }}</h3>
+              <p *ngIf="banner.subtitle" class="mt-1 text-sm text-gray-600">
+                {{ banner.subtitle }}
+              </p>
+            </div>
+
+            <dl class="grid gap-2 text-sm text-gray-500 md:grid-cols-2">
+              <div>
+                <dt class="font-medium text-gray-700">CTA</dt>
+                <dd>
+                  {{ banner.ctaLabel || 'Sin CTA' }}
+                  <span *ngIf="banner.ctaUrl">- {{ banner.ctaUrl }}</span>
+                </dd>
+              </div>
+              <div>
+                <dt class="font-medium text-gray-700">Vigencia</dt>
+                <dd>{{ formatSchedule(banner) }}</dd>
+              </div>
+              <div>
+                <dt class="font-medium text-gray-700">Imagen mobile</dt>
+                <dd>{{ banner.imageUrlMobile ? 'Configurada' : 'Usa imagen principal' }}</dd>
+              </div>
+              <div>
+                <dt class="font-medium text-gray-700">Ultima actualizacion</dt>
+                <dd>{{ banner.updatedAt | date:'short' }}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div class="flex flex-col gap-2 lg:w-[150px]">
+            <button
+              type="button"
+              class="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 transition hover:bg-gray-50"
+              (click)="moveBanner(i, -1)"
+              [disabled]="i === 0 || reordering"
+            >
+              Subir
+            </button>
+
+            <button
+              type="button"
+              class="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 transition hover:bg-gray-50"
+              (click)="moveBanner(i, 1)"
+              [disabled]="i === banners.length - 1 || reordering"
+            >
+              Bajar
+            </button>
+
+            <button
+              type="button"
+              class="rounded-lg bg-amber-500 px-3 py-2 text-sm font-medium text-white transition hover:bg-amber-600"
+              (click)="edit(banner)"
+            >
+              Editar
+            </button>
+
+            <button
+              type="button"
+              class="rounded-lg px-3 py-2 text-sm font-medium text-white transition"
+              [ngClass]="banner.isActive ? 'bg-red-600 hover:bg-red-700' : 'bg-emerald-600 hover:bg-emerald-700'"
+              (click)="toggleStatus(banner)"
+            >
+              {{ banner.isActive ? 'Desactivar' : 'Activar' }}
+            </button>
+
+            <button
+              type="button"
+              class="rounded-lg border border-red-200 px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50"
+              (click)="delete(banner)"
+            >
+              Eliminar
+            </button>
+          </div>
+        </article>
+      </div>
+    </section>
+  </div>
+</section>

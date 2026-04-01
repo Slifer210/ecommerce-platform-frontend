@@ -10,6 +10,8 @@ import { Category } from '../../product/models/category.model';
 import { ShopHeaderCustomerActionsComponent } from '../header-actions/shop-header-customer-actions/shop-header-customer-actions.component';
 import { ShopHeaderAdminActionsComponent } from '../header-actions/shop-header-admin-actions/shop-header-admin-actions.component';
 import { HeaderBaseComponent } from '../../../shared/layout/header-base/header-base.component';
+import { ShopFooterComponent } from '../../../shared/layout/shop-footer/shop-footer.component';
+import { AssistantWidgetComponent } from '../../assistant/components/assistant-widget/assistant-widget.component';
 
 @Component({
   selector: 'app-shop-layout',
@@ -18,8 +20,10 @@ import { HeaderBaseComponent } from '../../../shared/layout/header-base/header-b
     CommonModule,
     RouterModule,
     HeaderBaseComponent,
+    ShopFooterComponent,
     ShopHeaderCustomerActionsComponent,
-    ShopHeaderAdminActionsComponent
+    ShopHeaderAdminActionsComponent,
+    AssistantWidgetComponent
   ],
   templateUrl: './shop-layout.component.html'
 })

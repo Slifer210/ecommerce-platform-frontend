@@ -13,7 +13,7 @@ import { AuthState } from '../../../../core/auth/auth.state';
   styleUrls: ['./verify-email.component.css'],
   imports: [
     CommonModule,
-    AuthLayoutComponent
+    AuthLayoutComponent,
   ]
 })
 export class VerifyEmailComponent implements OnInit {

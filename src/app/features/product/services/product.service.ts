@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+import { CatalogHomeResponse } from '../models/catalog-home.model';
 import { CatalogProduct } from '../models/catalog-product.model';
 import { CatalogPageResponse } from '../models/catalog-facets.response';
 
@@ -79,7 +80,7 @@ export class ProductService {
         return this.http.get<CatalogProduct>(`${this.API_URL}/${id}`);
     }
 
-    getCatalogHome(): Observable<any> {
-        return this.http.get<any>(this.CATALOG_HOME_URL);
+    getCatalogHome(): Observable<CatalogHomeResponse> {
+        return this.http.get<CatalogHomeResponse>(this.CATALOG_HOME_URL);
     }
 }

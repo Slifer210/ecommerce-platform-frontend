@@ -13,6 +13,7 @@ import { CategoryService } from '../../services/category.service';
 import { ProductService } from '../../services/product.service';
 
 import { NavigationContextService } from '../../../../shared/navigation/navigation-context.service';
+import { CatalogBanner, CatalogHomeResponse } from '../../models/catalog-home.model';
 import { CatalogProduct } from '../../models/catalog-product.model';
 import { Category } from '../../models/category.model';
 import {
@@ -28,6 +29,7 @@ import { CatalogState } from '../../models/catalog.state';
 import { CatalogSidebarComponent } from '../../components/catalog-sidebar/catalog-sidebar.component';
 import { ProductCardComponent } from '../../../../shared/components/product-card/product-card.component';
 import { ProductSliderSectionComponent } from "../../../../shared/components/product-slider-section/product-slider-section.component";
+import { CatalogBannerCarouselComponent } from '../../../../shared/components/catalog-banner-carousel/catalog-banner-carousel.component';
 import { BreadcrumbComponent } from '../../../../shared/components/breadcrumb/breadcrumb.component';
 import { PaginationComponent } from "../../../../shared/components/pagination/pagination.component";
 import { CatalogControlsComponent } from "../../../../shared/components/catalog-controls/catalog-controls.component";
@@ -41,7 +43,7 @@ type SortKey =
 @Component({
   selector: 'app-catalog',
   standalone: true,
-  imports: [CommonModule, CatalogSidebarComponent, RouterModule, ProductCardComponent, ProductSliderSectionComponent, BreadcrumbComponent, PaginationComponent, CatalogControlsComponent],
+  imports: [CommonModule, CatalogSidebarComponent, RouterModule, ProductCardComponent, ProductSliderSectionComponent, CatalogBannerCarouselComponent, BreadcrumbComponent, PaginationComponent, CatalogControlsComponent],
   templateUrl: './catalog.component.html'
 })
 export class CatalogComponent implements OnInit {
@@ -71,8 +73,17 @@ export class CatalogComponent implements OnInit {
 
   // ===== Home (hero / quick / sections) =====
   readonly hero = signal<{ title: string; subtitle: string } | null>(null);
+  readonly banners = signal<CatalogBanner[]>([]);
 
   readonly quickCategories = signal<Category[]>([]);
+  readonly homeCategories = computed(() => {
+    const categories = this.allCategories();
+    const rootCategories = categories.filter(category => !category.parentId);
+
+    return rootCategories.length > 0
+      ? rootCategories
+      : this.quickCategories();
+  });
 
   readonly trending = signal<CatalogProduct[]>([]);
   readonly bestSellers = signal<CatalogProduct[]>([]);
@@ -325,8 +336,9 @@ export class CatalogComponent implements OnInit {
   // ===============================
   private loadHome(): void {
     this.productService.getCatalogHome().subscribe({
-      next: (res: any) => {
+      next: (res: CatalogHomeResponse) => {
         this.hero.set(res?.hero ?? null);
+        this.banners.set(res?.banners ?? []);
         this.quickCategories.set(res?.quickCategories ?? []);
         this.trending.set(res?.trending ?? []);
         this.bestSellers.set(res?.bestSellers ?? []);
@@ -335,6 +347,7 @@ export class CatalogComponent implements OnInit {
       },
       error: () => {
         this.hero.set(null);
+        this.banners.set([]);
         this.quickCategories.set([]);
         this.trending.set([]);
         this.bestSellers.set([]);

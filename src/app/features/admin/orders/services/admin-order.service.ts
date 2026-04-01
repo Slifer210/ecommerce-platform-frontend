@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+
+import { AdminOrderDetail } from '../models/admin-order-detail.model';
 import { AdminOrder } from '../models/admin-order.model';
 import { OrderStatusHistory } from '../models/order-status-history.model';
 
@@ -21,6 +23,10 @@ export class AdminOrderService {
         this.API,
         { params: customerId ? { customerId } : {} }
         );
+    }
+
+    getDetail(orderId: string): Observable<AdminOrderDetail> {
+        return this.http.get<AdminOrderDetail>(`${this.API}/${orderId}`);
     }
 
     // ============================

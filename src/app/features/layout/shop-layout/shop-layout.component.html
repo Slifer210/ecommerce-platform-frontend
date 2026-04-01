@@ -1,3 +1,4 @@
+<div class="flex min-h-screen flex-col bg-gray-50">
 <app-header-base homeLink="/products">
 
     <!-- BLOQUE CENTRAL -->
@@ -193,6 +194,10 @@
 
 </app-header-base>
 
-<main class="min-h-screen bg-gray-50">
+<main class="flex-1 bg-gray-50">
     <router-outlet></router-outlet>
 </main>
+
+<app-shop-footer [categories]="categories"></app-shop-footer>
+<app-assistant-widget></app-assistant-widget>
+</div>

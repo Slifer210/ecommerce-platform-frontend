@@ -1,0 +1,15 @@
+.assistant-history {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.8) transparent;
+}
+
+.assistant-history::-webkit-scrollbar {
+  width: 10px;
+}
+
+.assistant-history::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.8);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}

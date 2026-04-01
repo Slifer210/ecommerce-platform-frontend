@@ -4,9 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
 import { AdminOrderService } from '../../services/admin-order.service';
+import { AdminOrderDetail } from '../../models/admin-order-detail.model';
 import { AdminOrder } from '../../models/admin-order.model';
 import { OrderStatusHistory } from '../../models/order-status-history.model';
 import { AlertService } from '../../../../../core/services/alert.service';
+import { AppModalComponent } from '../../../../../shared/components/app-modal/app-modal.component';
 
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -17,7 +19,7 @@ import { saveAs } from 'file-saver';
 @Component({
   selector: 'app-admin-orders',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AppModalComponent],
   templateUrl: './admin-orders.component.html'
 })
 export class AdminOrdersComponent implements OnInit {
@@ -51,6 +53,13 @@ export class AdminOrdersComponent implements OnInit {
   // =========================
   history: OrderStatusHistory[] = [];
   showHistoryModal = false;
+
+  // =========================
+  // MODAL DETALLE
+  // =========================
+  detail: AdminOrderDetail | null = null;
+  showDetailModal = false;
+  loadingDetail = false;
 
   constructor(
     private adminOrderService: AdminOrderService,
@@ -292,5 +301,36 @@ export class AdminOrdersComponent implements OnInit {
   closeHistory(): void {
     this.showHistoryModal = false;
     this.history = [];
+  }
+
+  viewDetail(orderId: string): void {
+    this.showDetailModal = true;
+    this.loadingDetail = true;
+    this.detail = null;
+
+    this.adminOrderService.getDetail(orderId).subscribe({
+      next: detail => {
+        this.detail = detail;
+        this.loadingDetail = false;
+      },
+      error: error => {
+        this.loadingDetail = false;
+
+        if (error.status === 401) return;
+
+        this.showDetailModal = false;
+        this.alert.error('No se pudo cargar el detalle de la orden');
+      }
+    });
+  }
+
+  closeDetail(): void {
+    this.showDetailModal = false;
+    this.loadingDetail = false;
+    this.detail = null;
+  }
+
+  totalItems(detail: AdminOrderDetail): number {
+    return (detail.items ?? []).reduce((sum, item) => sum + item.quantity, 0);
   }
 }

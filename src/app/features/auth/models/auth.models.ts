@@ -13,6 +13,13 @@ export interface LoginResponse {
 export interface RegisterRequest {
     email: string;
     password: string;
+    fullName: string;
+    captchaToken: string;
+}
+
+export interface PasswordResetRequest {
+    email: string;
+    captchaToken: string;
 }
 
 // Response: GET /api/auth/me

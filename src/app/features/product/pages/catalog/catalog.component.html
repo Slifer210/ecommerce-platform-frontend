@@ -16,15 +16,21 @@
       </p>
     </section>
 
+    <!-- ================= BANNERS ================= -->
+    <app-catalog-banner-carousel
+      *ngIf="!exploreMode() && !catalogState.hasActiveFilters() && banners().length > 0"
+      [banners]="banners()"
+    ></app-catalog-banner-carousel>
+
 
     <!-- ================= QUICK CATEGORIES ================= -->
     <section
-      *ngIf="!exploreMode() && !catalogState.hasActiveFilters() && quickCategories().length > 0"
+      *ngIf="!exploreMode() && !catalogState.hasActiveFilters() && homeCategories().length > 0"
       class="flex justify-center"
     >
       <div class="flex flex-wrap justify-center gap-4 max-w-4xl">
         <button
-          *ngFor="let c of quickCategories()"
+          *ngFor="let c of homeCategories()"
           (click)="onCategorySelect(c.id)"
           class="px-5 py-2.5 text-sm font-medium
                  bg-gray-100 rounded-full
@@ -271,7 +277,7 @@
 <a
   href="https://wa.me/51916337058?text=Hola%20quiero%20informacion%20sobre%20sus%20productos"
   target="_blank"
-  class="fixed bottom-6 right-6 z-50 flex items-center justify-center
+  class="fixed bottom-28 right-6 z-50 flex items-center justify-center
           w-14 h-14 rounded-full bg-green-500 text-white
           shadow-lg hover:bg-green-600 hover:scale-110
           transition animate-bounce"

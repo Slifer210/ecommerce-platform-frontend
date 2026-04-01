@@ -1,0 +1,92 @@
+<footer class="mt-auto border-t border-slate-200 bg-white">
+  <div class="mx-auto grid max-w-7xl gap-10 px-6 py-12 md:grid-cols-[1.4fr_repeat(3,1fr)]">
+    <section class="space-y-5">
+      <a
+        routerLink="/products"
+        class="inline-flex items-center gap-3 text-slate-900 transition hover:opacity-80"
+      >
+        <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-black text-base font-bold text-white">
+          E
+        </span>
+        <span class="text-lg font-semibold tracking-tight">Shop</span>
+      </a>
+
+      <div class="space-y-2">
+        <h2 class="text-2xl font-semibold tracking-tight text-slate-900">
+          Compras simples, rápidas y con estilo.
+        </h2>
+        <p class="max-w-md text-sm leading-6 text-slate-600">
+          Encuentra productos destacados, administra tus pedidos y vuelve a comprar en pocos pasos.
+        </p>
+      </div>
+
+      <a
+        routerLink="/products"
+        class="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700"
+      >
+        Explorar catálogo
+      </a>
+    </section>
+
+    <section class="space-y-4">
+      <h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">
+        Navegación
+      </h3>
+
+      <nav class="grid gap-3 text-sm text-slate-600">
+        <a routerLink="/products" class="transition hover:text-slate-900">Productos</a>
+        <a routerLink="/cart" class="transition hover:text-slate-900">Carrito</a>
+        <a routerLink="/my-orders" class="transition hover:text-slate-900">Mis órdenes</a>
+        <a routerLink="/profile" class="transition hover:text-slate-900">Mi perfil</a>
+      </nav>
+    </section>
+
+    <section class="space-y-4">
+      <h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">
+        Categorías
+      </h3>
+
+      <div *ngIf="featuredCategories.length; else emptyCategories" class="grid gap-3 text-sm text-slate-600 sm:grid-cols-2">
+        <a
+          *ngFor="let category of featuredCategories"
+          [routerLink]="['/products']"
+          [queryParams]="{ category: category.id }"
+          class="transition hover:text-slate-900"
+        >
+          {{ category.name }}
+        </a>
+      </div>
+
+      <ng-template #emptyCategories>
+        <p class="text-sm text-slate-500">
+          Las categorías destacadas aparecerán aquí.
+        </p>
+      </ng-template>
+    </section>
+
+    <section class="space-y-4">
+      <h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">
+        Cuenta
+      </h3>
+
+      <nav class="grid gap-3 text-sm text-slate-600">
+        <a routerLink="/auth/login" class="transition hover:text-slate-900">Ingresar</a>
+        <a routerLink="/notifications" class="transition hover:text-slate-900">Notificaciones</a>
+        <a routerLink="/addresses" class="transition hover:text-slate-900">Direcciones</a>
+        <a routerLink="/products" [queryParams]="{ featured: true }" class="transition hover:text-slate-900">
+          Novedades
+        </a>
+      </nav>
+    </section>
+  </div>
+
+  <div class="border-t border-slate-200 bg-slate-50">
+    <div class="mx-auto flex max-w-7xl flex-col gap-3 px-6 py-5 text-sm text-slate-500 md:flex-row md:items-center md:justify-between">
+      <p>&copy; {{ currentYear }} Shop. Todo listo para seguir comprando.</p>
+      <div class="flex items-center gap-4">
+        <a routerLink="/products" class="transition hover:text-slate-900">Seguir explorando</a>
+        <a routerLink="/cart" class="transition hover:text-slate-900">Ver carrito</a>
+      </div>
+    </div>
+  </div>
+</footer>

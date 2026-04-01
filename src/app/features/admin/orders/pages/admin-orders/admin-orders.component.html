@@ -109,6 +109,13 @@
 
         <td class="p-2 border space-x-2">
             <button
+            class="px-2 py-1 bg-slate-700 text-white rounded hover:bg-slate-800 transition"
+            (click)="viewDetail(order.orderId)"
+            >
+            Detalle
+            </button>
+
+            <button
             *ngIf="order.status === 'PAID'"
             class="px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
             (click)="ship(order.orderId)"
@@ -139,6 +146,152 @@
 <div *ngIf="!loading && filteredOrders.length === 0" class="text-gray-500">
     No hay órdenes con esos filtros.
 </div>
+
+<app-modal
+    [open]="showDetailModal"
+    (close)="closeDetail()"
+    width="980px"
+>
+    <div modal-header>
+        <h3 class="text-lg font-semibold text-gray-900">
+            Detalle de la orden
+        </h3>
+        <p class="mt-1 text-sm text-gray-500">
+            Informacion completa del comprador, envio e items.
+        </p>
+    </div>
+
+    <div *ngIf="loadingDetail" class="flex items-center gap-3 py-8 text-sm text-gray-500">
+        <span class="h-5 w-5 rounded-full border-2 border-gray-300 border-t-blue-600 animate-spin"></span>
+        Cargando detalle...
+    </div>
+
+    <ng-container *ngIf="!loadingDetail && detail as d">
+        <div class="space-y-6">
+            <div class="grid gap-4 md:grid-cols-5">
+                <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                    <div class="text-xs uppercase tracking-[0.2em] text-gray-400">Orden</div>
+                    <div class="mt-2 break-all text-sm font-semibold text-gray-900">{{ d.orderId }}</div>
+                </div>
+
+                <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                    <div class="text-xs uppercase tracking-[0.2em] text-gray-400">Estado</div>
+                    <div class="mt-2 text-sm font-semibold text-gray-900">{{ d.status }}</div>
+                </div>
+
+                <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                    <div class="text-xs uppercase tracking-[0.2em] text-gray-400">Total</div>
+                    <div class="mt-2 text-sm font-semibold text-gray-900">S/ {{ d.total | number:'1.2-2' }}</div>
+                </div>
+
+                <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                    <div class="text-xs uppercase tracking-[0.2em] text-gray-400">Creada</div>
+                    <div class="mt-2 text-sm text-gray-700">{{ d.createdAt | date:'medium' }}</div>
+                </div>
+
+                <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                    <div class="text-xs uppercase tracking-[0.2em] text-gray-400">Pagada</div>
+                    <div class="mt-2 text-sm text-gray-700">
+                        {{ d.paidAt ? (d.paidAt | date:'medium') : 'Pendiente' }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+                <section class="rounded-2xl border border-gray-200 p-5">
+                    <h4 class="text-base font-semibold text-gray-900">Comprador</h4>
+
+                    <div class="mt-4 grid gap-4 md:grid-cols-2">
+                        <div>
+                            <div class="text-sm text-gray-500">Nombre</div>
+                            <div class="font-medium text-gray-900">{{ d.buyerName || 'Sin dato' }}</div>
+                        </div>
+
+                        <div>
+                            <div class="text-sm text-gray-500">Email</div>
+                            <div class="font-medium text-gray-900 break-all">{{ d.buyerEmail || 'Sin dato' }}</div>
+                        </div>
+
+                        <div>
+                            <div class="text-sm text-gray-500">Telefono</div>
+                            <div class="font-medium text-gray-900">{{ d.buyerPhone || 'Sin dato' }}</div>
+                        </div>
+
+                        <div>
+                            <div class="text-sm text-gray-500">Documento</div>
+                            <div class="font-medium text-gray-900">{{ d.buyerDocument || 'Sin dato' }}</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="rounded-2xl border border-gray-200 p-5">
+                    <h4 class="text-base font-semibold text-gray-900">Direccion de envio</h4>
+
+                    <div *ngIf="d.shippingAddress as address; else noAddress" class="mt-4 space-y-2">
+                        <div class="font-medium text-gray-900">
+                            {{ address.addressLine }}
+                        </div>
+
+                        <div class="text-sm text-gray-600">
+                            {{ address.district || '-' }},
+                            {{ address.province || '-' }},
+                            {{ address.department || '-' }}
+                        </div>
+
+                        <div *ngIf="address.country || address.postalCode" class="text-sm text-gray-500">
+                            {{ address.country || 'Pais no definido' }}
+                            <span *ngIf="address.postalCode">- {{ address.postalCode }}</span>
+                        </div>
+
+                        <div *ngIf="address.reference" class="text-sm text-gray-500">
+                            Ref: {{ address.reference }}
+                        </div>
+                    </div>
+
+                    <ng-template #noAddress>
+                        <div class="mt-4 text-sm text-gray-500">
+                            No hay direccion registrada.
+                        </div>
+                    </ng-template>
+                </section>
+            </div>
+
+            <section class="rounded-2xl border border-gray-200 p-5">
+                <div class="flex items-center justify-between gap-3">
+                    <h4 class="text-base font-semibold text-gray-900">
+                        Items ({{ totalItems(d) }})
+                    </h4>
+                    <span class="text-sm text-gray-500">{{ d.items.length }} producto(s)</span>
+                </div>
+
+                <div class="mt-4 overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                        <thead class="bg-gray-50 text-gray-600">
+                            <tr>
+                                <th class="px-4 py-3 text-left font-medium">Producto</th>
+                                <th class="px-4 py-3 text-left font-medium">Cantidad</th>
+                                <th class="px-4 py-3 text-left font-medium">Precio unit.</th>
+                                <th class="px-4 py-3 text-left font-medium">Total</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr *ngFor="let item of d.items" class="border-t border-gray-100">
+                                <td class="px-4 py-3">
+                                    <div class="font-medium text-gray-900">{{ item.productName }}</div>
+                                    <div class="text-xs text-gray-500">{{ item.productId }}</div>
+                                </td>
+                                <td class="px-4 py-3 text-gray-700">{{ item.quantity }}</td>
+                                <td class="px-4 py-3 text-gray-700">S/ {{ item.unitPrice | number:'1.2-2' }}</td>
+                                <td class="px-4 py-3 font-medium text-gray-900">S/ {{ item.total | number:'1.2-2' }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </ng-container>
+</app-modal>
 
 <!-- MODAL HISTORIAL -->
 <div

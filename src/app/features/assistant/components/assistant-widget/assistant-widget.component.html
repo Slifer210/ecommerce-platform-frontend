@@ -1,0 +1,337 @@
+<button
+  type="button"
+  class="fixed bottom-6 right-6 z-40 inline-flex items-center gap-3 rounded-full bg-black px-4 py-3 text-sm font-semibold text-white shadow-xl transition hover:-translate-y-0.5 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-black/20"
+  (click)="openAssistant()"
+  aria-label="Abrir asistente de IA"
+>
+  <span class="flex h-10 w-10 items-center justify-center rounded-full bg-white/10">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="h-5 w-5"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      stroke-width="1.8"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M8 10h8M8 14h5m6 6-3.8-2.17A9.96 9.96 0 0 1 12 18c-5.523 0-10-3.582-10-8s4.477-8 10-8 10 3.582 10 8a7.58 7.58 0 0 1-3 6"
+      />
+    </svg>
+  </span>
+  <span class="hidden sm:block">Asistente IA</span>
+</button>
+
+<app-modal
+  [open]="open()"
+  [width]="modalWidth"
+  (close)="closeAssistant()"
+>
+  <div modal-header class="space-y-2">
+    <div class="flex flex-wrap items-center gap-2">
+      <h2 class="text-lg font-semibold text-gray-900">Asistente IA</h2>
+      <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600">
+        Read-only
+      </span>
+    </div>
+    <p class="text-sm text-gray-500">
+      Consulta pedidos, productos y ayuda general sin ejecutar acciones sobre tu cuenta.
+    </p>
+  </div>
+
+  <div class="flex min-h-[28rem] flex-col gap-4">
+    <div
+      class="assistant-history flex-1 space-y-4 overflow-y-auto rounded-2xl border border-gray-200 bg-gray-50/80 p-4"
+    >
+      <div
+        *ngIf="conversation().length === 0"
+        class="space-y-4"
+      >
+        <div class="rounded-2xl border border-dashed border-gray-200 bg-white p-5">
+          <p class="text-sm font-medium text-gray-900">
+            Haz preguntas sobre tus pedidos, tus compras recientes o productos del catalogo.
+          </p>
+          <p class="mt-2 text-sm text-gray-500">
+            Esta primera version es solo de consulta. No cancela, paga ni modifica ordenes.
+          </p>
+        </div>
+
+        <div
+          *ngIf="!isAuthenticated()"
+          class="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800"
+        >
+          Inicia sesion para consultar tu informacion personalizada desde el asistente.
+
+          <div class="mt-3">
+            <button
+              type="button"
+              class="rounded-full bg-amber-600 px-4 py-2 font-semibold text-white transition hover:bg-amber-700"
+              (click)="goToLogin()"
+            >
+              Ir a iniciar sesion
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="isAuthenticated()" class="space-y-3">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">
+            Ideas para empezar
+          </p>
+
+          <div class="flex flex-wrap gap-2">
+            <button
+              *ngFor="let suggestion of suggestions"
+              type="button"
+              class="rounded-full border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 transition hover:border-gray-300 hover:bg-gray-100"
+              (click)="sendMessage(suggestion)"
+            >
+              {{ suggestion }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div
+        *ngFor="let item of conversation(); trackBy: trackByMessage"
+        class="flex"
+        [class.justify-end]="item.role === 'user'"
+      >
+        <div
+          class="max-w-[92%] rounded-2xl px-4 py-3 shadow-sm"
+          [ngClass]="item.role === 'user'
+            ? 'bg-black text-white'
+            : 'border border-gray-200 bg-white text-gray-900'"
+        >
+          <p class="whitespace-pre-wrap text-sm leading-6">
+            {{ item.text }}
+          </p>
+
+          <div
+            *ngIf="item.reply as reply"
+            class="mt-4 space-y-4 border-t border-gray-100 pt-4"
+          >
+            <ng-container *ngIf="reply.intent === 'ORDER_STATUS'">
+              <div
+                *ngIf="reply.order as order"
+                class="rounded-2xl border border-gray-200 bg-gray-50 p-4"
+              >
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.12em] text-gray-400">
+                      Pedido
+                    </p>
+                    <p class="mt-1 font-semibold text-gray-900">
+                      {{ order.orderId | slice:0:8 }}
+                    </p>
+                  </div>
+
+                  <span
+                    class="rounded-full px-2.5 py-1 text-xs font-semibold"
+                    [ngClass]="statusTone(order.status)"
+                  >
+                    {{ statusLabel(order.status) }}
+                  </span>
+                </div>
+
+                <div class="mt-4 grid gap-3 text-sm text-gray-600 sm:grid-cols-2">
+                  <div>
+                    <p class="text-xs uppercase tracking-[0.12em] text-gray-400">Fecha</p>
+                    <p class="mt-1 text-gray-900">{{ order.createdAt | date:'medium' }}</p>
+                  </div>
+                  <div>
+                    <p class="text-xs uppercase tracking-[0.12em] text-gray-400">Items</p>
+                    <p class="mt-1 text-gray-900">{{ order.itemsCount }}</p>
+                  </div>
+                  <div>
+                    <p class="text-xs uppercase tracking-[0.12em] text-gray-400">Total</p>
+                    <p class="mt-1 text-gray-900">S/ {{ order.total | number:'1.2-2' }}</p>
+                  </div>
+                  <div *ngIf="order.lastStatusChange">
+                    <p class="text-xs uppercase tracking-[0.12em] text-gray-400">Ultimo cambio</p>
+                    <p class="mt-1 text-gray-900">{{ order.lastStatusChange | date:'medium' }}</p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  class="mt-4 inline-flex items-center gap-2 rounded-full border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-white"
+                  (click)="goToOrder(order.orderId)"
+                >
+                  Ver detalle
+                </button>
+              </div>
+            </ng-container>
+
+            <div
+              *ngIf="reply.intent === 'LIST_ORDERS' && reply.orders.length > 0"
+              class="space-y-3"
+            >
+              <article
+                *ngFor="let order of reply.orders"
+                class="rounded-2xl border border-gray-200 bg-gray-50 p-4"
+              >
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p class="font-semibold text-gray-900">Orden {{ order.orderId | slice:0:8 }}</p>
+                    <p class="mt-1 text-sm text-gray-500">
+                      {{ order.createdAt | date:'mediumDate' }} · {{ order.itemsCount }} item{{ order.itemsCount === 1 ? '' : 's' }}
+                    </p>
+                  </div>
+
+                  <div class="text-right">
+                    <p class="font-semibold text-gray-900">S/ {{ order.total | number:'1.2-2' }}</p>
+                    <span
+                      class="mt-2 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold"
+                      [ngClass]="statusTone(order.status)"
+                    >
+                      {{ statusLabel(order.status) }}
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  class="mt-4 inline-flex items-center gap-2 rounded-full border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-white"
+                  (click)="goToOrder(order.orderId)"
+                >
+                  Abrir orden
+                </button>
+              </article>
+            </div>
+
+            <div
+              *ngIf="reply.intent === 'PRODUCT_SEARCH' && reply.products.length > 0"
+              class="grid gap-3 md:grid-cols-2"
+            >
+              <article
+                *ngFor="let product of reply.products"
+                class="overflow-hidden rounded-2xl border border-gray-200 bg-gray-50"
+              >
+                <div class="flex h-full flex-col">
+                  <div class="aspect-[4/3] overflow-hidden bg-white">
+                    <img
+                      *ngIf="product.mainImageUrl; else productFallback"
+                      [src]="product.mainImageUrl"
+                      [alt]="product.name"
+                      class="h-full w-full object-contain"
+                      loading="lazy"
+                    />
+                    <ng-template #productFallback>
+                      <div class="flex h-full items-center justify-center text-sm text-gray-400">
+                        Sin imagen
+                      </div>
+                    </ng-template>
+                  </div>
+
+                  <div class="flex flex-1 flex-col p-4">
+                    <p class="font-semibold text-gray-900">{{ product.name }}</p>
+                    <p class="mt-2 line-clamp-3 text-sm text-gray-500">
+                      {{ product.description || 'Sin descripcion disponible.' }}
+                    </p>
+
+                    <div class="mt-4 flex items-center justify-between gap-3">
+                      <div>
+                        <p class="text-lg font-semibold text-gray-900">
+                          S/ {{ product.price | number:'1.2-2' }}
+                        </p>
+                        <p class="text-xs text-gray-500">
+                          {{ product.stock === 0 ? 'Sin stock' : (product.stock == null ? 'Stock no disponible' : product.stock + ' disponibles') }}
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        class="rounded-full border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-white"
+                        (click)="goToProduct(product.id)"
+                      >
+                        Ver producto
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            </div>
+
+            <ng-container *ngIf="reply.intent === 'HELP'">
+              <div
+                *ngIf="reply.knowledge as knowledge"
+                class="rounded-2xl border border-sky-100 bg-sky-50 p-4"
+              >
+                <p class="font-semibold text-sky-900">
+                  {{ knowledge.title || 'Ayuda' }}
+                </p>
+                <p class="mt-2 text-sm leading-6 text-sky-900/80">
+                  {{ knowledge.answer }}
+                </p>
+              </div>
+            </ng-container>
+
+            <div
+              *ngIf="reply.hints.length > 0"
+              class="space-y-2"
+            >
+              <p class="text-xs font-semibold uppercase tracking-[0.12em] text-gray-400">
+                Sugerencias
+              </p>
+
+              <div class="flex flex-wrap gap-2">
+                <button
+                  *ngFor="let hint of reply.hints"
+                  type="button"
+                  class="rounded-full border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 transition hover:border-gray-300 hover:bg-gray-100"
+                  (click)="sendMessage(hint)"
+                >
+                  {{ hint }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="loading()" class="flex">
+        <div class="rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-500 shadow-sm">
+          Consultando asistente...
+        </div>
+      </div>
+    </div>
+
+    <div
+      *ngIf="errorMessage()"
+      class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700"
+    >
+      {{ errorMessage() }}
+    </div>
+
+    <div class="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+      <label class="sr-only" for="assistant-message">Mensaje para el asistente</label>
+      <textarea
+        #messageInput
+        id="assistant-message"
+        rows="2"
+        class="w-full resize-none border-0 bg-transparent px-2 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none"
+        [disabled]="!isAuthenticated() || loading()"
+        [ngModel]="message()"
+        (ngModelChange)="message.set($event)"
+        (keydown)="onComposerKeydown($event)"
+        placeholder="Preguntame por tu pedido, tus ordenes o productos..."
+      ></textarea>
+
+      <div class="flex flex-wrap items-center justify-between gap-3 border-t border-gray-100 px-2 pt-3">
+        <p class="text-xs text-gray-400">
+          Solo lectura. No realiza pagos, cancelaciones ni cambios de orden.
+        </p>
+
+        <button
+          type="button"
+          class="rounded-full bg-black px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-900 disabled:cursor-not-allowed disabled:bg-gray-300"
+          [disabled]="!canSend()"
+          (click)="sendMessage()"
+        >
+          {{ loading() ? 'Enviando...' : 'Enviar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</app-modal>

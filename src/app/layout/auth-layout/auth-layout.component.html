@@ -1,20 +1,63 @@
-<div class="min-h-screen flex items-center justify-center px-4">
+<div class="auth-shell">
+    <div class="auth-grid">
 
-    <div class="min-w-[480px] max-w-[480px]">
+        <section class="auth-showcase">
+            <div class="auth-showcase__panel">
+                <span class="auth-showcase__badge">Compra mas rapido</span>
 
-        <div
-        class="bg-white
-                rounded-xl
-                shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1)]
-                border border-slate-200
-                p-8 md:p-10
-                min-h-[560px]"
-        >
+                <h2 class="auth-showcase__title">
+                    Vuelve a tus favoritos y compra en minutos.
+                </h2>
 
-        <ng-content></ng-content>
+                <p class="auth-showcase__text">
+                    Tu carrito, tus pedidos y las novedades de la tienda quedan
+                    listos apenas entras.
+                </p>
 
-        </div>
+                <div class="auth-showcase__highlights">
+                    <article class="auth-highlight">
+                        <span class="auth-highlight__number">01</span>
+                        <div>
+                            <h3>Retoma tu carrito</h3>
+                            <p>Sigue donde te quedaste y llega al checkout mas rapido.</p>
+                        </div>
+                    </article>
+
+                    <article class="auth-highlight">
+                        <span class="auth-highlight__number">02</span>
+                        <div>
+                            <h3>Sigue tus pedidos</h3>
+                            <p>Revisa estados, direcciones y compras recientes en un paso.</p>
+                        </div>
+                    </article>
+
+                    <article class="auth-highlight">
+                        <span class="auth-highlight__number">03</span>
+                        <div>
+                            <h3>Descubre lo nuevo</h3>
+                            <p>Encuentra mas vendidos, novedades y productos destacados.</p>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="auth-showcase__metrics">
+                    <span class="auth-metric">Mas vendidos</span>
+                    <span class="auth-metric">Novedades</span>
+                    <span class="auth-metric">Mis pedidos</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="auth-panel">
+            <div class="auth-card">
+                <div class="auth-card__beam"></div>
+                <div class="auth-card__ring"></div>
+
+                <div class="auth-card__content">
+                    <ng-content></ng-content>
+                </div>
+            </div>
+        </section>
 
     </div>
-
 </div>
